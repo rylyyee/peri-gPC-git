@@ -13,25 +13,24 @@ update_target_point_positions_peri(
     const int finest_ln = hierarchy->getFinestLevelNumber();
 
     static const double pi = 4*atan(1);
-    static const double V = 0.2; //velocity of the wing during translation (meters/sec)
+	static const double V = 0.2; //velocity of the wing during translation (meters/sec)
 	
 	////////////////////////////////////////////////////////////////////////////////////////
-	// These parameters require modification to match the desired geometry and motion
-	// These parameters can be changed in the parameter input file that is run alongside input2d.
-
+	// these parameters require modification to match the desired geometry and motion
+	
     static const double L1 = pf.L1; // length of computational domain (meters)
     static const int N1 = pf.N1; // number of cartesian grid meshwidths at the finest level of the AMR grid
     static const double ds = L1/(2.0*N1);
     static const double Let = pf.Let;
-    static const double diameter = pf.diameter;			// diameter of tube
-    static const double R2 = pf.R2;				// distance from middle of domain to inner wall
-    static const double R1 = pf.R1;		// distance from middle of domain to outer wall
-    static const double pamp = pf.pamp;				//percent occlusion of the tube
-    static const double amp = pf.amp;	//amplitude of contraction of each piece of the actuator
-    static const double freq = pf.freq;
-    static const double iposn = pf.iposn;
-    double s_ramp = 0.5*(1/freq);
-    double c_amp;
+    static const double diameter = pf.tdiameter;			// diameter of tube
+	static const double R2 = pf.tR2;				// distance from middle of domain to inner wall
+	static const double R1 = R2+diameter;		// distance from middle of domain to outer wall
+	static const double pamp = pf.pamp;				//percent occlusion of the tube
+	static const double amp = pamp*diameter/2.0;	//amplitude of contraction of each piece of the actuator
+	static const double freq = pf.freq;
+        static const double iposn = pf.iposn;
+	double s_ramp = 0.5*(1/freq);
+	double c_amp;
 
  ////////////////////////////////////////////////////////////////////////////////////////////////
 
