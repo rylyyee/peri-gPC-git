@@ -23,7 +23,7 @@ struct ParameterFile {
 	// Set parameter values given input file name
 	void set(string & param_file){
 
-		ifstream fsin(param_file);
+	        ifstream fsin(param_file.c_str());
 		string tmp_line;
 
 		while (getline(fsin, tmp_line)){
