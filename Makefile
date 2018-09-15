@@ -1,17 +1,27 @@
+
 ######################################################################
 ## Here specify the location of the IBAMR source and the location
 ## where IBAMR has been built.
-IBAMR_SRC_DIR = /Users/Bosque/sfw/ibamr/IBAMR
-IBAMR_BUILD_DIR = /Users/Bosque/sfw/ibamr/killdevil-opt
+#
+LIBS = $(LIBS) -lnetcdf -lcurl
+#
+IBAMR_SRC_DIR = /nas/longleaf/apps-dogwood/ibamr/2018-03/sfw/ibamr/IBAMR
+IBAMR_BUILD_DIR  =/nas/longleaf/apps-dogwood/ibamr/2018-03/sfw/ibamr/ibamr-objs-opt
+#IBAMR_SRC_DIR = /home/lwaldrop/sfw/bridges/ibamr_intel/IBAMR  #Uncomment for use on bridges
+#IBAMR_BUILD_DIR = /home/lwaldrop/sfw/bridges/ibamr_intel/bridges-intel-opt #Uncomment for use on bridges
 
+#IBAMR_SRC_DIR = /Users/Bosque/sfw/ibamr/IBAMR
+#IBAMR_BUILD_DIR = /Users/Bosque/sfw/ibamr/killdevil-opt
+#IBAMR_SRC_DIR = /Users/Bosque/sfw/ibamr/IBAMR
+#IBAMR_BUILD_DIR = /Users/Bosque/sfw/ibamr/killdevil-opt
 ######################################################################
 ## Include variables specific to the particular IBAMR build.
 include $(IBAMR_BUILD_DIR)/config/make.inc
 
 ######################################################################
 ## Build the IB tester application.
-SOURCES = main.C update_target_point_positions_peri.C update_target_point_positions_peri.h parameterfile.h
-OBJS = main.o update_target_point_positions_peri.o
+SOURCES = main.C update_target_point_positions.C update_target_point_positions.h parameterfile.h update_springs.C update_springs.h  
+OBJS = main.o update_target_point_positions.o update_springs.o
 
 default:
 	@echo "make one of: main2d, main3d"
