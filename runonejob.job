@@ -1,0 +1,19 @@
+#!/bin/bash
+#SBATCH --job-name=onejob12
+#SBATCH --partition=knl
+#SBATCH --time=48:00:00
+#SBATCH -N 1
+#SBATCH --ntasks=12
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=lindsay.waldrop@nmt.edu
+
+# echo commands to stdout
+set -x
+# move to working directory
+cd /21dayscratch/scr/l/w/lwaldrop/peri-gPC-git
+# add appropriate modules
+# module load 
+
+
+# run MPI program                                                               
+remora mpirun ./main2d input2d1 parameters1

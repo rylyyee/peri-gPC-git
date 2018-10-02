@@ -30,7 +30,7 @@
 
 
 // Headers for application specific operations.
-#include "update_target_point_positions.h"
+#include "update_target_point_positions_peri.h"
 //#include "update_springs.h"
 
 // Function prototypes
@@ -258,7 +258,7 @@ main(
 
             dt = time_integrator->getMaximumTimeStepSize();
             LDataManager* l_data_manager = ib_method_ops->getLDataManager();
-            update_target_point_positions(patch_hierarchy, l_data_manager, loop_time, dt, pf);
+            update_target_point_positions_peri(patch_hierarchy, l_data_manager, loop_time, dt, pf);
 	  		//update_springs(patch_hierarchy, l_data_manager, loop_time, dt, pf);
             time_integrator->advanceHierarchy(dt);
             loop_time += dt;
