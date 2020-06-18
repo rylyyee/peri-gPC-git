@@ -1,9 +1,10 @@
 ######################################################################
 ## Here specify the location of the IBAMR source and the location
 ## where IBAMR has been built.
-IBAMR_SRC_DIR = /Users/Spectre/sfw/ibamr/IBAMR
-IBAMR_BUILD_DIR = /Users/Spectre/sfw/ibamr/killdevil-dbg
-
+LIBS = $(LIBS) -lnetcdf -lcurl
+#
+IBAMR_SRC_DIR = /home/lwaldrop/sfw/bridges/ibamr/IBAMR
+IBAMR_BUILD_DIR = /home/lwaldrop/sfw/bridges/ibamr/bridges-intel-opt
 ######################################################################
 ## Include variables specific to the particular IBAMR build.
 include $(IBAMR_BUILD_DIR)/config/make.inc
