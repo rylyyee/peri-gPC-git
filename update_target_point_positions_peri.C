@@ -55,13 +55,9 @@ void update_target_point_positions_peri(
     {
         LNode* node_idx = *it;
         IBTargetPointForceSpec* force_spec = node_idx->getNodeDataItem<IBTargetPointForceSpec>();
-        if (force_spec == NULL) continue;  // skip to next node
+    if (force_spec == NULL) continue;  // skip to next node
 
     const int lag_idx = node_idx->getLagrangianIndex();
-
-	//Depending on the version of IBAMR, you need to select one of the ways of accessing target point positions
-    //TinyVector<double,NDIM>& X_target = force_spec->getTargetPointPosition();
-	IBTK::Vector<double,NDIM>& X_target = force_spec->getTargetPointPosition();
 	Point& X_target = force_spec->getTargetPointPosition();
 	
 	if(current_time<s_ramp)
