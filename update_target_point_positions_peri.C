@@ -37,8 +37,10 @@ void update_target_point_positions_peri(
  ////////////////////////////////////////////////////////////////////////////////////////////////
 
     // Find out the Lagrangian index ranges.
-    const std::pair<int,int>& actuator_top_idxs = l_data_manager->getLagrangianStructureIndexRange(0, finest_ln);
-	const std::pair<int,int>& actuator_bot_idxs = l_data_manager->getLagrangianStructureIndexRange(1, finest_ln);
+    //const std::pair<int,int>& actuator_top_idxs = l_data_manager->getLagrangianStructureIndexRange(0, finest_ln);
+	//const std::pair<int,int>& actuator_bot_idxs = l_data_manager->getLagrangianStructureIndexRange(1, finest_ln);
+	    const std::pair<int,int>& lag_idxs = l_data_manager->getLagrangianStructureIndexRange(0, finest_ln);
+		const std::pair<int,int>& lag_idxs = l_data_manager->getLagrangianStructureIndexRange(1, finest_ln);
 
     // Get the LMesh (which we assume to be associated with the finest level of
     // the patch hierarchy).  Note that we currently need to update both "local"
