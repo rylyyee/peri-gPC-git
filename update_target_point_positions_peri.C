@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void update_target_point_positions(
+void update_target_point_positions_peri(
 				   tbox::Pointer<hier::PatchHierarchy<NDIM> > hierarchy,
 				   LDataManager* const l_data_manager,
 				   const double current_time,
