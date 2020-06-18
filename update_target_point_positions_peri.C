@@ -4,14 +4,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void 
-update_target_point_positions_peri(
- 	   tbox::Pointer<hier::PatchHierarchy<NDIM> > hierarchy,
- 	   LDataManager* const l_data_manager,
- 	   const double current_time,
- 	   const double dt,
- 	   ParameterFile & pf)
+void update_target_point_positions_peri(
+			   tbox::Pointer<hier::PatchHierarchy<NDIM> > hierarchy,
+			   LDataManager* const l_data_manager,
+			   const double current_time,
+			   const double dt,
+			   ParameterFile & pf)
 {
+   // Find finest grid level number in simulation
     const int finest_ln = hierarchy->getFinestLevelNumber();
 
     static const double pi = 4*atan(1);
@@ -57,22 +57,11 @@ update_target_point_positions_peri(
         IBTargetPointForceSpec* force_spec = node_idx->getNodeDataItem<IBTargetPointForceSpec>();
         if (force_spec == NULL) continue;  // skip to next node
 
-        // Here we update the position of the target point.
-        //
-        // NOTES: lag_idx      is the "index" of the Lagrangian point (lag_idx = 0, 1, ..., N-1, where N is the number of Lagrangian points)
-        //        X_target     is the target position of the target point
-        //        X_target[0]  is the x component of the target position
-        //        X_target[1]  is the y component of the target position
-        //        X_target[2]  is the z component of the target position (for a 3D simulation)
-        //
-        // The target position is shifted to the left or right by the
-        // increment dt*V
-
-        const int lag_idx = node_idx->getLagrangianIndex();
+    const int lag_idx = node_idx->getLagrangianIndex();
 
 	//Depending on the version of IBAMR, you need to select one of the ways of accessing target point positions
     //TinyVector<double,NDIM>& X_target = force_spec->getTargetPointPosition();
-	//IBTK::Vector<double,NDIM>& X_target = force_spec->getTargetPointPosition();
+	IBTK::Vector<double,NDIM>& X_target = force_spec->getTargetPointPosition();
 	Point& X_target = force_spec->getTargetPointPosition();
 	
 	if(current_time<s_ramp)
