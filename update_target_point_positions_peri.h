@@ -28,6 +28,7 @@
 #include <ibtk/muParserRobinBcCoefs.h>
 
 #include <ibamr/app_namespaces.h>
+
 #include "parameterfile.h"
 
 /*
@@ -42,4 +43,3 @@ update_target_point_positions_peri(
     ParameterFile &);
 
 #endif //#ifndef included_update_target_point_positions_peri
-
