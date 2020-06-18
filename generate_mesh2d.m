@@ -95,14 +95,14 @@ vertex_fid = fopen([mesh_name 'tube_' num2str(N) '.vertex'], 'w');
 fprintf(vertex_fid, '%d\n', Nstraight);
 
 %top part
-for i=1:ceil(Nstraight/2),
+for i=1:ceil(Nstraight/2)
     ytop = centery-R2;
     xtop = -Lt/2+(i-1)*ds;
     fprintf(vertex_fid, '%1.16e %1.16e\n', xtop, ytop);
 end
 
 %bottom part
-for i=ceil(Nstraight/2)+1:Nstraight,
+for i=ceil(Nstraight/2)+1:Nstraight
     ybot = centery-R1;
     xbot = -Lt/2+(i-ceil(Nstraight/2)-1)*ds;
     fprintf(vertex_fid, '%1.16e %1.16e\n', xbot, ybot);
@@ -117,8 +117,8 @@ vertex_fid = fopen(['markers_' num2str(N) '.vertex'], 'w');
 fprintf(vertex_fid, '%d\n', Nmarkers);
 
 %top part
-for i=0:Nmarkersx-1,
-    for j=0:Nmarkersy-1,
+for i=0:Nmarkersx-1
+    for j=0:Nmarkersy-1
         y = centery-R2-j*dmy;
         x = -Let/2+i*dmx;
     fprintf(vertex_fid, '%1.16e %1.16e\n', x, y);
@@ -158,28 +158,36 @@ end
 % prescribed peristalsis part
 % Write out the vertex information
 
-%top part
-vertex_fid = fopen(['pperi_top_' num2str(N) '.vertex'], 'w');
-fprintf(vertex_fid, '%d\n', NLap);
+% Allocate space for variables
+ytop_elastic = zeros(1,ceil(Nstraight/2));
+xtop_elastic = zeros(1,ceil(Nstraight/2));
+ybot_elastic = zeros(1,ceil(Nstraight/2));
+xbot_elastic = zeros(1,ceil(Nstraight/2));
 
-for i=Na1p:Na2p,
-    ytop = centery-R2;
-    xtop = -Lt/2+i*ds;
-    fprintf(vertex_fid, '%1.16e %1.16e\n', xtop, ytop);
+% Vertex information
+vertex_fid = fopen([mesh_name 'tube_' num2str(N) '.vertex'], 'w');
+fprintf(vertex_fid, '%d\n', 2*Nstraight);
+
+% Top section, elastic tube
+for i = 1:Nstraight
+    ytop_elastic(1,i) = centery-R2;
+    xtop_elastic(1,i) = -Lt/2+(i-1)*0.5*ds;
+    fprintf(vertex_fid, '%1.16e %1.16e\n', xtop_elastic(1,i), ytop_elastic(1,i));
 end
+
+% Bottom section, elastic tube
+for  i = 1:Nstraight
+    ybot_elastic(1,i) = centery-R1;
+    xbot_elastic(1,i) = -Lt/2+(i-1)*0.5*ds;
+    fprintf(vertex_fid, '%1.16e %1.16e\n', xbot_elastic(1,i), ybot_elastic(1,i));
+end
+
 fclose(vertex_fid);
 
-%bottom part
-vertex_fid = fopen(['pperi_bot_' num2str(N) '.vertex'], 'w');
-fprintf(vertex_fid, '%d\n', NLap);
-
-for i=Na1p:Na2p,
-    ybot = centery-R1;
-    xbot = -Lt/2+i*ds;
-    fprintf(vertex_fid, '%1.16e %1.16e\n', xbot, ybot);
-end
-fclose(vertex_fid);
-
+% Plots elastic tube vertices
+plot(xtop_elastic,ytop_elastic,'r.')
+hold on
+plot(xbot_elastic,ybot_elastic,'g.')
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % valveless pumping applied force
@@ -233,52 +241,64 @@ fclose(vertex_fid);
 % race track part
 % Write out the vertex information
 
+% Allocate Space
+x_race = zeros(1,Nrace);
+y_race = zeros(1,Nrace);
+
 vertex_fid = fopen([mesh_name 'race_' num2str(N) '.vertex'], 'w');
 fprintf(vertex_fid, '%d\n', Nrace);
 
-%right curved part of racetrack
-for i=1:ceil(Ncurve/2),
+%right inner curved part of racetrack 
+for i=1:ceil(Ncurve/2)
     theta = (i-1)*dtheta-pi/2;
-    yin = centery+R2*sin(theta);
-    xin = Lt/2+R2*cos(theta);
-    fprintf(vertex_fid, '%1.16e %1.16e\n', xin, yin);
+    y_race(1,i) = centery+R2*sin(theta);
+    x_race(1,i) = Lt/2+R2*cos(theta);
+    fprintf(vertex_fid, '%1.16e %1.16e\n', x_race(1,i), y_race(1,i));
 end
 
-for i=ceil(Ncurve/2)+1:Ncurve,
-    theta=(i-Ncurve/2-1)*dtheta-pi/2;
-    yout = centery+R1*sin(theta);
-    xout = Lt/2+R1*cos(theta);
-    fprintf(vertex_fid, '%1.16e %1.16e\n', xout, yout);
+%straight inner section on the top
+for i = ceil(Ncurve/2)+1:ceil(Ncurve/2)+ceil(Nstraight/2)
+    y_race(1,i) = centery+R2;
+    x_race(1,i) = centerx2-(i-ceil(Ncurve/2)-1)*ds;
+    fprintf(vertex_fid, '%1.16e %1.16e\n', x_race(1,i), y_race(1,i));
 end
 
-%straight section on the top
-for i = Ncurve+1:Ncurve+ceil(Nstraight/2),
-    yin = centery+R2;
-    xin = centerx2-(i-Ncurve-1)*ds;
-    fprintf(vertex_fid, '%1.16e %1.16e\n', xin, yin);
+%left inner curved part of racetrack
+for i = ceil(Ncurve/2)+ceil(Nstraight/2)+1:Ncurve+ceil(Nstraight/2)
+    theta = pi/2+(i-(ceil(Ncurve/2)+ceil(Nstraight/2))-1)*dtheta;
+    y_race(1,i) = centery+R2*sin(theta);
+    x_race(1,i) = centerx1+R2*cos(theta);
+    fprintf(vertex_fid, '%1.16e %1.16e\n', x_race(1,i), y_race(1,i));
 end
 
-for i = Ncurve+ceil(Nstraight/2)+1:Ncurve+Nstraight,
-    yout = centery+R1;
-    xout = centerx2-(i-Ncurve-ceil(Nstraight/2)-1)*ds;
-    fprintf(vertex_fid, '%1.16e %1.16e\n', xout, yout);
+%right outer curved part of racetrack 
+for i=Ncurve+ceil(Nstraight/2)+1:Ncurve+ceil(Ncurve/2)+ceil(Nstraight/2),
+    theta=(i-(Ncurve+ceil(Nstraight/2))-1)*dtheta-pi/2;
+    y_race(1,i) = centery+R1*sin(theta);
+    x_race(1,i) = Lt/2+R1*cos(theta);
+    fprintf(vertex_fid, '%1.16e %1.16e\n', x_race(1,i), y_race(1,i));
 end
 
-%left curved part of racetrack
-for i = Ncurve+Nstraight+1:Ncurve+Nstraight+ceil(Ncurve/2),
-    theta = pi/2+(i-Ncurve-Nstraight-1)*dtheta;
-    yin = centery+R2*sin(theta);
-    xin = centerx1+R2*cos(theta);
-    fprintf(vertex_fid, '%1.16e %1.16e\n', xin, yin);
+%straight outer section on the top
+for i = Ncurve+ceil(Ncurve/2)+ceil(Nstraight/2)+1:Ncurve+ceil(Ncurve/2)+Nstraight,
+    y_race(1,i) = centery+R1;
+    x_race(1,i) = centerx2-(i-(Ncurve+ceil(Ncurve/2)+ceil(Nstraight/2))-1)*ds;
+    fprintf(vertex_fid, '%1.16e %1.16e\n', x_race(1,i), y_race(1,i));
 end
 
-for i = Ncurve+Nstraight+ceil(Ncurve/2)+1:2*Ncurve+Nstraight,
-    theta = pi/2+(i-Ncurve-Nstraight-ceil(Ncurve/2)-1)*dtheta;
-    yout = centery+R1*sin(theta);
-    xout = centerx1+R1*cos(theta);
-    fprintf(vertex_fid, '%1.16e %1.16e\n', xout, yout);
+
+%left outer curved part of racetrack
+for i = Ncurve+ceil(Ncurve/2)+Nstraight+1:2*Ncurve+Nstraight,
+    theta = pi/2+(i-(Ncurve+ceil(Ncurve/2)+Nstraight)-1)*dtheta;
+    y_race(1,i) = centery+R1*sin(theta);
+    x_race(1,i) = centerx1+R1*cos(theta);
+    fprintf(vertex_fid, '%1.16e %1.16e\n', x_race(1,i), y_race(1,i));
 end
 fclose(vertex_fid);
+
+% Plots the racetrack vertices
+plot(x_race,y_race,'k.')
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -335,11 +355,11 @@ spring_fid = fopen([mesh_name 'tube_' num2str(N) '.spring'], 'w');
 fprintf(spring_fid, '%d\n', Nstraight-2);
 
 %elastic part of tube
-for i = 0:ceil(Nstraight/2)-2,
+for i = 0:ceil(Nstraight/2)-2
     fprintf(spring_fid, '%d %d %1.16e %1.16e\n', i, i+1, kappa_spring*ds/(ds^2), ds);
 end
 
-for i = ceil(Nstraight/2):Nstraight-2,
+for i = ceil(Nstraight/2):Nstraight-2
     fprintf(spring_fid, '%d %d %1.16e %1.16e\n', i, i+1, kappa_spring*ds/(ds^2), ds);
 end
 
@@ -383,11 +403,11 @@ beam_fid = fopen([mesh_name 'tube_' num2str(N) '.beam'], 'w');
 fprintf(beam_fid, '%d\n', Nstraight-4);
 
 %elastic part of tube
-for i = 0:ceil(Nstraight/2)-3,
+for i = 0:ceil(Nstraight/2)-3
     fprintf(beam_fid, '%d %d %d %1.16e\n', i, i+1, i+2, kappa_beam*ds/(ds^4));
 end
 
-for i = ceil(Nstraight/2):Nstraight-3,
+for i = ceil(Nstraight/2):Nstraight-3
     fprintf(beam_fid, '%d %d %d %1.16e\n', i, i+1, i+2, kappa_beam*ds/(ds^4));
 end
 fclose(beam_fid);
