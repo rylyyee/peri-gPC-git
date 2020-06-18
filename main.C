@@ -2,6 +2,8 @@
 //#include <IBAMR_prefix_config.h>
 //#include <IBTK_prefix_config.h>
 #include <SAMRAI_config.h>
+#include <IBAMR_config.h> //added for MODULE 2016-11 NAB
+#include <IBTK_config.h>  //added for MODULE 2016-11 NAB
 
 // Headers for basic PETSc functions
 #include <petscsys.h>
@@ -17,12 +19,14 @@
 #include <ibamr/IBMethod.h>
 #include <ibamr/IBStandardForceGen.h>
 #include <ibamr/IBStandardInitializer.h>
+#include <ibamr/INSCollocatedHierarchyIntegrator.h> //added for MODULE 2016-11 NAB
 #include <ibamr/INSStaggeredHierarchyIntegrator.h>
 #include <ibamr/app_namespaces.h>
 #include <ibtk/AppInitializer.h>
+#include <ibtk/LData.h> 
 #include <ibtk/muParserCartGridFunction.h>
 #include <ibtk/muParserRobinBcCoefs.h>
-#include <ibtk/LData.h>
+
 
 // Headers for application specific operations.
 //#include "update_target_point_positions.h"
@@ -165,8 +169,8 @@ main(
         Pointer<IBStandardInitializer> ib_initializer = new IBStandardInitializer("IBStandardInitializer", app_initializer->getComponentDatabase("IBStandardInitializer"));
         ib_method_ops->registerLInitStrategy(ib_initializer);
         Pointer<IBStandardForceGen> ib_force_fcn = new IBStandardForceGen();
-	ib_force_fcn->registerSpringForceFunction(1,&vp_spring_force,&vp_spring_force_deriv);
-	ib_force_fcn->registerSpringForceFunction(2,&peri_spring_force,&peri_spring_force_deriv);
+		//ib_force_fcn->registerSpringForceFunction(1,&vp_spring_force,&vp_spring_force_deriv);
+		//ib_force_fcn->registerSpringForceFunction(2,&peri_spring_force,&peri_spring_force_deriv);
         ib_method_ops->registerIBLagrangianForceFunction(ib_force_fcn);
 
         // Create Eulerian initial condition specification objects.
