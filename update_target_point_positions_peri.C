@@ -4,15 +4,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void update_target_point_positions_peri(
-			   tbox::Pointer<hier::PatchHierarchy<NDIM> > hierarchy,
-			   LDataManager* const l_data_manager,
-			   const double current_time,
-			   const double dt,
-			   ParameterFile & pf)
+void update_target_point_positions(
+				   tbox::Pointer<hier::PatchHierarchy<NDIM> > hierarchy,
+				   LDataManager* const l_data_manager,
+				   const double current_time,
+				   const double dt,
+				   ParameterFile & pf)
 {
-   // Find finest grid level number in simulation
-    const int finest_ln = hierarchy->getFinestLevelNumber();
+  // Find finest grid level number in simulation
+  const int finest_ln = hierarchy->getFinestLevelNumber();
 
     static const double pi = 4*atan(1);
 	static const double V = 0.2; //velocity of the wing during translation (meters/sec)
@@ -39,7 +39,7 @@ void update_target_point_positions_peri(
     // Find out the Lagrangian index ranges.
     const std::pair<int,int>& actuator_top_idxs = l_data_manager->getLagrangianStructureIndexRange(0, finest_ln);
 	const std::pair<int,int>& actuator_bot_idxs = l_data_manager->getLagrangianStructureIndexRange(1, finest_ln);
-	
+
     // Get the LMesh (which we assume to be associated with the finest level of
     // the patch hierarchy).  Note that we currently need to update both "local"
     // and "ghost" node data.

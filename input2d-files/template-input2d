@@ -20,7 +20,6 @@ DX = (1.0*L)/NFINEST                      // Cartesian mesh width (m)
 //
 // solver parameters
 DELTA_FUNCTION      = "IB_4"              //
-SOLVER_TYPE         = "STAGGERED"         //
 START_TIME          = 0.0e0               // initial simulation time
 END_TIME            = 2.5               // final simulation time
 GROW_DT             = 2.0e0               // growth factor for timesteps

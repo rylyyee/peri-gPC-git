@@ -44,4 +44,3 @@ update_target_point_positions_peri(
     ParameterFile &);
 
 #endif //#ifndef included_update_target_point_positions_peri
-
