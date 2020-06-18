@@ -1,9 +1,9 @@
 // Config files
 //#include <IBAMR_prefix_config.h>
 //#include <IBTK_prefix_config.h>
-#include <SAMRAI_config.h>
 #include <IBAMR_config.h> //added for MODULE 2016-11 NAB
 #include <IBTK_config.h>  //added for MODULE 2016-11 NAB
+#include <SAMRAI_config.h>
 
 // Headers for basic PETSc functions
 #include <petscsys.h>
@@ -23,18 +23,14 @@
 #include <ibamr/INSStaggeredHierarchyIntegrator.h>
 #include <ibamr/app_namespaces.h>
 #include <ibtk/AppInitializer.h>
-#include <ibtk/LData.h> 
+#include <ibtk/LData.h>
 #include <ibtk/muParserCartGridFunction.h>
 #include <ibtk/muParserRobinBcCoefs.h>
 
 
 // Headers for application specific operations.
-//#include "update_target_point_positions.h"
 #include "update_target_point_positions_peri.h"
-//#include "update_springs_vp_aforce.h"
-//#include "update_springs_peri_aforce.h"
 
-//#include "parameterfile.h"
 
 // Function prototypes
 void
@@ -45,55 +41,6 @@ output_data(
     const int iteration_num,
     const double loop_time,
     const string& data_dump_dirname);
-
-inline double
-vp_spring_force(
-    double R,
-    const double* params,
-    int lag_mastr_idx,
-    int lag_slave_idx)
-{
-    const double F = params[0];
-    const double phase_fun = params[1];
-    return F*phase_fun;
-}// frequency_spring_force
-
-
-inline double
-vp_spring_force_deriv(
-    double R,
-    const double* params,
-    int lag_mastr_idx,
-    int lag_slave_idx)
-{
-    return 0;
-}//frequency_spring_force_deriv
-
-inline double
-peri_spring_force(
-    double R,
-    const double* params,
-    int lag_mastr_idx,
-    int lag_slave_idx)
-{
-    const double F = params[0];
-    const double phase_fun = params[1];
-    return F*phase_fun;
-}// frequency_spring_force
-
-
-inline double
-peri_spring_force_deriv(
-    double R,
-    const double* params,
-    int lag_mastr_idx,
-    int lag_slave_idx)
-{
-    return 0;
-}//frequency_spring_force_deriv
-
-
-
 
 /*******************************************************************************
  * For each run, the input filename and restart information (if needed) must   *
@@ -263,15 +210,7 @@ main(
 
             dt = time_integrator->getMaximumTimeStepSize();
             LDataManager* l_data_manager = ib_method_ops->getLDataManager();
-            //update_target_point_positions(patch_hierarchy, l_data_manager, loop_time, dt);
-
-		// original here
-            //update_target_point_positions_peri(patch_hierarchy, l_data_manager, loop_time, dt);
-		// new here
             update_target_point_positions_peri(patch_hierarchy, l_data_manager, loop_time, dt, pf);
-
-	    //update_springs_vp_aforce(patch_hierarchy, l_data_manager, loop_time, dt);
-	    //update_springs_peri_aforce(patch_hierarchy, l_data_manager, loop_time, dt);
             time_integrator->advanceHierarchy(dt);
             loop_time += dt;
 
