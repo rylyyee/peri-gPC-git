@@ -90,24 +90,24 @@ phase = 0;                      %initial phase of the oscillating force, where F
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Make the elastic section of the tube
 % Write out the vertex information
-
-vertex_fid = fopen([mesh_name 'tube_' num2str(N) '.vertex'], 'w');
-fprintf(vertex_fid, '%d\n', Nstraight);
-
-%top part
-for i=1:ceil(Nstraight/2)
-    ytop = centery-R2;
-    xtop = -Lt/2+(i-1)*ds;
-    fprintf(vertex_fid, '%1.16e %1.16e\n', xtop, ytop);
-end
-
-%bottom part
-for i=ceil(Nstraight/2)+1:Nstraight
-    ybot = centery-R1;
-    xbot = -Lt/2+(i-ceil(Nstraight/2)-1)*ds;
-    fprintf(vertex_fid, '%1.16e %1.16e\n', xbot, ybot);
-end
-fclose(vertex_fid);
+% 
+% vertex_fid = fopen([mesh_name 'tube_' num2str(N) '.vertex'], 'w');
+% fprintf(vertex_fid, '%d\n', Nstraight);
+% 
+% %top part
+% for i=1:ceil(Nstraight/2)
+%     ytop = centery-R2;
+%     xtop = -Lt/2+(i-1)*ds;
+%     fprintf(vertex_fid, '%1.16e %1.16e\n', xtop, ytop);
+% end
+% 
+% %bottom part
+% for i=ceil(Nstraight/2)+1:Nstraight
+%     ybot = centery-R1;
+%     xbot = -Lt/2+(i-ceil(Nstraight/2)-1)*ds;
+%     fprintf(vertex_fid, '%1.16e %1.16e\n', xbot, ybot);
+% end
+% fclose(vertex_fid);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -128,33 +128,6 @@ end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% actuator part
-% Write out the vertex information
-%
-%top part
-%vertex_fid = fopen(['actuator_top_' num2str(N) '.vertex'], 'w');
-%fprintf(vertex_fid, '%d\n', NLa);
-%
-%for i=Na1:Na2,
-%    ytop = centery-R2;
-%    xtop = -Lt/2+i*ds;
-%    fprintf(vertex_fid, '%1.16e %1.16e\n', xtop, ytop);
-%end
-%fclose(vertex_fid);
-%
-%bottom part
-%vertex_fid = fopen(['actuator_bot_' num2str(N) '.vertex'], 'w');
-%fprintf(vertex_fid, '%d\n', NLa);
-%
-%for i=Na1:Na2,
-%    ybot = centery-R1;
-%    xbot = -Lt/2+i*ds;
-%    fprintf(vertex_fid, '%1.16e %1.16e\n', xbot, ybot);
-%end
-%fclose(vertex_fid);
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % prescribed peristalsis part
 % Write out the vertex information
 
@@ -166,19 +139,19 @@ xbot_elastic = zeros(1,ceil(Nstraight/2));
 
 % Vertex information
 vertex_fid = fopen([mesh_name 'tube_' num2str(N) '.vertex'], 'w');
-fprintf(vertex_fid, '%d\n', 2*Nstraight);
+fprintf(vertex_fid, '%d\n', Nstraight);
 
 % Top section, elastic tube
-for i = 1:Nstraight
+for i = 1:(Nstraight/2)
     ytop_elastic(1,i) = centery-R2;
-    xtop_elastic(1,i) = -Lt/2+(i-1)*0.5*ds;
+    xtop_elastic(1,i) = -Lt/2+(i-1)*ds;
     fprintf(vertex_fid, '%1.16e %1.16e\n', xtop_elastic(1,i), ytop_elastic(1,i));
 end
 
 % Bottom section, elastic tube
-for  i = 1:Nstraight
+for  i = 1:(Nstraight/2)
     ybot_elastic(1,i) = centery-R1;
-    xbot_elastic(1,i) = -Lt/2+(i-1)*0.5*ds;
+    xbot_elastic(1,i) = -Lt/2+(i-1)*ds;
     fprintf(vertex_fid, '%1.16e %1.16e\n', xbot_elastic(1,i), ybot_elastic(1,i));
 end
 
