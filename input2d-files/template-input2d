@@ -231,7 +231,6 @@ Main { //
    log_all_nodes = FALSE                //
 //
 // visualization dump parameters
-<<<<<<< HEAD:input2d
    viz_writer = "VisIt","Silo"                //
    viz_dump_interval = 5000        // set to zero to turn off
    viz_dump_dirname = "viz_IB2d"                //
