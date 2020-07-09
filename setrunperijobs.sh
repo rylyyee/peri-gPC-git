@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # What should you space the jobs by?
-countby=5
+countby=3
 endrun=15
 howmany=$((endrun/countby))
 

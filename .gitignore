@@ -1,2 +1,6 @@
 *.*~
 *~
+parameters-files/parameters*
+input2d-files/input2d*
+*.log
+*.out
