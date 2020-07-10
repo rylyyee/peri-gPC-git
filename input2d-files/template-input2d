@@ -232,7 +232,7 @@ Main { //
 //
 // visualization dump parameters
    viz_writer = "VisIt","Silo"                //
-   viz_dump_interval = 1000        // set to zero to turn off
+   viz_dump_interval = 10000        // set to zero to turn off
    viz_dump_dirname = "viz_IB2d"                //
    visit_number_procs_per_file = 1                //
 //
@@ -241,7 +241,7 @@ Main { //
    restart_write_dirname = "restart_IB2d"                //
 //
 // hierarchy data dump parameters
-   data_dump_interval = 5000         // set to zero to turn off
+   data_dump_interval = 10000         // set to zero to turn off
    data_dump_dirname = "hier_data_IB2d"                //
 //
 // timer dump parameters

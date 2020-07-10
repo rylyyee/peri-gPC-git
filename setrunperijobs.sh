@@ -1,22 +1,17 @@
 #!/bin/bash
 
 # What should you space the jobs by?
-countby=3
-endrun=15
-howmany=$((endrun/countby))
+startrun=2
+endrun=3
 
-for i in `seq 1 $howmany`;
+echo Submitting simulations $startrun to $endrun.
+
+for j in `seq $startrun $endrun`;
 do
 
-second=$((countby*i))
-first=$((second-(countby-1)))
-echo Print $first to $second runs. 
+echo Job ${j}.
+awk -v var="$j" 'NR==11 {$0="i="'"var"'""} 1' runperi.job > temp${j}.job
 
-awk -v var="$first" 'NR==8 {$0="startrun="'"var"'""} 1' runperi.job > temp${i}
-awk -v var="$second" 'NR==9 {$0="endrun="'"var"'""} 1' temp${i} > go${first}to${second}.job
-
-rm temp${i}
-
-#sbatch go${first}to${second}.job
+sbatch temp${j}.job
 
 done
