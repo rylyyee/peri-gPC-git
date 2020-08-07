@@ -130,6 +130,31 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % prescribed peristalsis part
 % Write out the vertex information
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% prescribed peristalsis part
+% Write out the vertex information
+
+%top part
+vertex_fid = fopen(['pperi_top_' num2str(N) '.vertex'], 'w');
+fprintf(vertex_fid, '%d\n', NLap);
+
+for i=Na1p:Na2p,
+    ytop = centery-R2;
+    xtop = -Lt/2+i*ds;
+    fprintf(vertex_fid, '%1.16e %1.16e\n', xtop, ytop);
+end
+fclose(vertex_fid);
+
+%bottom part
+vertex_fid = fopen(['pperi_bot_' num2str(N) '.vertex'], 'w');
+fprintf(vertex_fid, '%d\n', NLap);
+
+for i=Na1p:Na2p,
+    ybot = centery-R1;
+    xbot = -Lt/2+i*ds;
+    fprintf(vertex_fid, '%1.16e %1.16e\n', xbot, ybot);
+end
+fclose(vertex_fid);
 
 % Allocate space for variables
 ytop_elastic = zeros(1,ceil(Nstraight/2));
