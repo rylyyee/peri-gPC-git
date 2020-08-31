@@ -1,12 +1,12 @@
 #!/bin/bash
 
 # Separate main parameter file into three files
-cut -f 1 allpara.txt > Wo.txt
+cut -f 1 allpara_165.txt > Wo.txt
 # cut -f 2 allpara.txt > pamp.txt
-cut -f 3 allpara.txt > Freq.txt
+cut -f 3 allpara_165.txt > Freq.txt
 
 # Count number of lines in files
-numlines=$(grep -c "^" allpara.txt)
+numlines=$(grep -c "^" allpara_165.txt)
 
 # initialize variables
 WO=0
