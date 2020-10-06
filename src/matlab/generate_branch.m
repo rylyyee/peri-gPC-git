@@ -287,7 +287,6 @@ for i=Na1p:Na2p,
 end
 fclose(vertex_fid);
 
-fclose(target_fid);
 
 
 % Write out the target point information for the actuator
