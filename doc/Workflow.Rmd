@@ -1,0 +1,20 @@
+---
+title: "Workflow for the Heart Tube Project"
+author: "Lindsay Waldrop"
+date: "10/5/2020"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction
+
+This is the simulation and data analysis workflow for heart tube project with multi-circulatory systems. It includes all the steps necessary to generate results from cloning the project on Github to plotting figures for publications in R. 
+
+## Overview of the workflow
+
+
+## 1. 
+
