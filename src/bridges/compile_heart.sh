@@ -11,13 +11,12 @@ echo "Setting up directories..."
 mkdir bin/
 mkdir results/
 mkdir results/ibamr
-mkdir results/ibamr/${track}_runs/
-mkdir results/ibamr/${track}_log-files/
+mkdir results/ibamr/runs/
+mkdir results/ibamr/log-files/
 mkdir results/visit/
 mkdir results/visit/${track}/
 mkdir results/r-csv-files/
 mkdir results/r-csv-files/${track}/
-mkdir data/
 mkdir data/input2d-files/
 mkdir data/parameters-files/
 mkdir data/csv-files/
