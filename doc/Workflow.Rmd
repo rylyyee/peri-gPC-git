@@ -33,9 +33,9 @@ The pipeline has the following components:
  2. The generation of directories, compiling of the main code (main2d) from C and C++ IBAMR source code, and input files and parameters files necessary for IBAMR and data analysis in VisIt (lineout files) for the gPC simulation set. 
  3. The generation of vertex, target, beam, and spring files in MATLAB.
  4. The execution of IBAMR simulations for the gPC simulation set. 
- 4. The execution of VisIt data analysis to extract fluid speed information from each IBAMR simulation. 
- 5. The execution of R scripts for calculation of final values. 
- 6. The generation of figures for publication from analyzed data. 
+ 5. The execution of VisIt data analysis to extract fluid speed information from each IBAMR simulation. 
+ 6. The execution of R scripts for calculation of final values. 
+ 7. The generation of figures for publication from analyzed data. 
 
 ## 1. The cloning of the projection from Github
 
@@ -76,7 +76,7 @@ Note: these instructions are specifically for the Bridges cluster at PSC, but th
 
 There are two files in `src/bridges` that control submitting batch jobs to the Bridges cluster: `runperi.job` and `setrunperijobs.sh`. `setrunperijobs.sh` generates a set of temporary job files and submits them via sbatch, based on `runperi.job` as a template. 
 
-Each simulation takes between 3.5 and 5 hours to run on Bridges as it is currently configured. However, should you wish to change parameters, lines 2 through 6 in `runperi.job` set out options passed to SLURM during submission. All other aspects of the file have already been updated when `compile_heart.sh` was run. 
+Each simulation takes between 5 and 7 hours to run on Bridges as it is currently configured. However, should you wish to change parameters, lines 2 through 6 in `runperi.job` set out options passed to SLURM during submission. All other aspects of the file have already been updated when `compile_heart.sh` was run. 
 
 After altering these, you can run any number in a series of simulations at one time using `setrunperijobs.sh`. In command-line bash, simply provide the start number as the first number after the shell script and the end number as the second. In this example, simulations 1 through 20 are started using sbatch:
 
@@ -84,5 +84,7 @@ After altering these, you can run any number in a series of simulations at one t
 
 When these runs have finished successfully, the viz_IB2d files are automatically zipped and will be deposited in `results/runs`. Log files will be located in `results/log-files`. It is recommended that you move completed simulation directory `results/ibamr/runs` to `results/ibamr/track_runs` (where track is the name of the circulatory system you used) in keeping with the structure of the project. 
 
-## 5. 
+## 5. Execution of VisIt data analysis scripts
+
+
 

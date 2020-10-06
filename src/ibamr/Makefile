@@ -6,7 +6,7 @@ LIBS = $(LIBS) -lnetcdf -lcurl
 #
 IBAMR_SRC_DIR = /home/lwaldrop/sfw/bridges/ibamr/IBAMR
 IBAMR_BUILD_DIR = /home/lwaldrop/sfw/bridges/ibamr/bridges-intel-opt
-#
+OUTPUT = /pylon5/bi561lp/lwaldrop/peri-gPC-git/bin
 ######################################################################
 ## Include variables specific to the particular IBAMR build.
 include $(IBAMR_BUILD_DIR)/config/make.inc
@@ -31,11 +31,11 @@ main3d:
 
 main-2d: $(IBAMR_LIB_2D) $(IBTK_LIB_2D) $(OBJS) $(SOURCES)
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(OBJS) \
-	$(IBAMR_LIB_2D) $(IBTK_LIB_2D) $(LIBS) -DNDIM=$(PDIM) -o main2d
+	$(IBAMR_LIB_2D) $(IBTK_LIB_2D) $(LIBS) -DNDIM=$(PDIM) -o $(OUTPUT)/main2d
 
 main-3d: $(IBAMR_LIB_3D) $(IBTK_LIB_3D) $(OBJS) $(SOURCES)
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(OBJS) \
-	$(IBAMR_LIB_3D) $(IBTK_LIB_3D) $(LIBS) -DNDIM=$(PDIM) -o main3d
+	$(IBAMR_LIB_3D) $(IBTK_LIB_3D) $(LIBS) -DNDIM=$(PDIM) -o $(OUTPUT)/main3d
 
 clean:
 	$(RM) main2d main3d core

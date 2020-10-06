@@ -6,3 +6,4 @@ input2d-files/input2d*
 *.out
 .Rproj.user
 *.DS_Store
+*.Rhistory
