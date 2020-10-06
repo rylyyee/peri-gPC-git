@@ -36,7 +36,7 @@ cd "$WD"/src/bridges/
 sh setinput2d.sh "$WD" ${a}
 sh setparameters.sh "$WD" ${a}
 
-awk -v var="$name" 'NR==15 {$0="WD=/pylon5/bi561lp/"'"var"'"/peri-gPC-git/"} 1' runperi.job > temprunperi.job
+awk -v var="$name" 'NR==15 {$0="WD=/pylon5/bi561lp/"'"var"'"/peri-gPC-git"} 1' runperi.job > temprunperi.job
 rm runperi.job
 mv temprunperi.job runperi.job
 

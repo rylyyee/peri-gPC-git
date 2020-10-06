@@ -12,7 +12,7 @@ set -x
 i=119
 
 # Set path 
-WD=/pylon5/bi561lp/lwaldrop/peri-gPC-git/
+WD=/pylon5/bi561lp/lwaldrop/peri-gPC-git
 
 # move to working directory
 cd "${WD}"/bin
