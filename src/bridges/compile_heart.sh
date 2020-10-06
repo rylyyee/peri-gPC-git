@@ -24,11 +24,11 @@ mkdir data/csv-files/${track}/
 mkdir data/ibamr-files/
 mkdir data/ibamr-files/${track}/
 
-cd "$WD"/src/ibamr
+cd "$WD"/bin
 echo "Compiling main2d..."
+cp "$WD"/src/ibamr/* .
 make main2d
-mv main2d "$WD"/bin
-rm *.o stamp-2d
+rm *.o stamp-2d *.C Makefile *.h
 
 cd "$WD"/src/bridges/
 
