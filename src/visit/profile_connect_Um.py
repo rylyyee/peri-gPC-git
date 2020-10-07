@@ -2,22 +2,26 @@
 #
 # Note: you must create destination folders before beginning! 
 #
+import sys
 
-for num in range(1,682):
+WDin=sys.argv[1]
+WDout=sys.argv[2]
+startnum=int(float(sys.argv[3]))
+endnum=int(float(sys.argv[4]))
 
-	OpenDatabase("localhost:/Users/Bosque/IBAMR/peri-gPC/newcode_runs/viz_IB2d"+str(num)+"/lag_data.visit", 0)
-	#OpenDatabase("localhost:/Users/Spectre/Dropbox/peri-gPC/tess"+str(num).zfill(2)+"/viz_IB2d/lag_data.visit",0)
-	AddPlot("Mesh", "heart_race_512_vertices", 1, 0)
-	AddPlot("Mesh", "heart_tube_512_mesh", 1, 0)
-	AddPlot("Mesh", "heart_tube_512_vertices", 1, 0)
-	DrawPlots()
-	OpenDatabase("localhost:/Users/Bosque/IBAMR/peri-gPC/newcode_runs/viz_IB2d"+str(num)+"/dumps.visit", 0)
-	#OpenDatabase("localhost:/Users/Spectre/Dropbox/peri-gPC/tess01/viz_IB2d/dumps.visit", 0)
+for num in range(startnum,endnum):
+
+	#OpenDatabase(str(WDin)+"/viz_IB2d"+str(num)+"/lag_data.visit", 0)
+	#AddPlot("Mesh", "heart_race_512_vertices", 1, 0)
+	#AddPlot("Mesh", "heart_tube_512_mesh", 1, 0)
+	#AddPlot("Mesh", "heart_tube_512_vertices", 1, 0)
+	#DrawPlots()
+	OpenDatabase(str(WDin)+"/viz_IB2d"+str(num)+"/dumps.visit", 0)
 	HideActivePlots()
 	AddPlot("Pseudocolor", "U_magnitude", 1, 0)
-	SetActivePlots(4)
-	SetActivePlots(4)
 	DrawPlots()
+	SetActivePlots(4)
+	SetActivePlots(4)
 	globalLineout = GetGlobalLineoutAttributes()
 	globalLineout.Dynamic=1;
 	globalLineout.curveOption=0;
@@ -29,14 +33,13 @@ for num in range(1,682):
 	for i in range(TimeSliderGetNStates()):
 		SetActiveWindow(1)
 		TimeSliderNextState()
-		Query("Lineout", end_point=(0, 0.201, 0), num_samples=50, start_point=(0, 0.099, 0), use_sampling=0)
+		Query("Lineout", end_point=(0.4, 0, 0), num_samples=50, start_point=(0.3, 0, 0), use_sampling=0)
 		SetActiveWindow(2)
 		SetActivePlots(0)
 		SaveWindowAtts = SaveWindowAttributes()
 		SaveWindowAtts.outputToCurrentDirectory = 0
-		SaveWindowAtts.outputDirectory = "/Users/Bosque/IBAMR/peri-gPC/newcode_runs/newcode"+str(num)+"_profiles"
-		SaveWindowAtts.fileName = "newcode"+str(num).zfill(3)+"_Um_profile"
-#		SaveWindowAtts.fileName = "tess01_topcross_Um_profile"
+		SaveWindowAtts.outputDirectory = str(WDout)+"/sim"+str(num)
+		SaveWindowAtts.fileName = "Um_profile"
 		SaveWindowAtts.family = 1
 		SaveWindowAtts.format = SaveWindowAtts.CURVE  # BMP, CURVE, JPEG, OBJ, PNG, POSTSCRIPT, POVRAY, PPM, RGB, STL, TIFF, ULTRA, VTK, PLY
 		SaveWindowAtts.width = 1024
@@ -57,11 +60,8 @@ for num in range(1,682):
 	SetActiveWindow(1)
 	DeleteActivePlots()
 	DeleteActivePlots()
-	DeleteActivePlots()
-	DeleteActivePlots()
-	DeleteActivePlots()
-	#OpenDatabase("localhost:/Users/Spectre/Dropbox/peri-gPC/tess"+str(num).zfill(2)+"/viz_IB2d/dumps.visit")
-	#OpenDatabase("localhost:/Users/Spectre/Dropbox/peri-gPC/tess"+str(num).zfill(2)+"/viz_IB2d/lag_data.visit")
-
+	#DeleteActivePlots()
+	#DeleteActivePlots()
+	#DeleteActivePlots()
 
 exit()
