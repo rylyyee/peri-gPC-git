@@ -1,12 +1,14 @@
 #!/bin/bash
 
+WD=${1:?Provide a working directory}
+a=${2:?Provide a simulation set number}
+
 # Separate main parameter file into three files
-# cut -f 1 allpara.txt > Wo.txt
-cut -f 2 allpara_165.txt > pamp.txt
-cut -f 3 allpara_165.txt > Freq.txt
+cut -f 2 "$WD"/data/parameters/allpara_${a}.txt > pamp.txt
+cut -f 3 "$WD"/data/parameters/allpara_${a}.txt > Freq.txt
 
 # Count number of lines in files
-numlines=$(grep -c "^" allpara_165.txt)
+numlines=$(grep -c "^" "$WD"/data/parameters/allpara_${a}.txt)
 
 # initialize variables
 pam=0
@@ -25,14 +27,8 @@ cat template-parameters |  awk -v var="$Freq" 'NR==7 {$0="freq = "'"var"'"   \\"
 cat template-parameters |  awk -v var="$Freq" 'NR==8 {$0="iposn = "'"var"'"   \\"} 1' parametersw${i}f${i} > parametersw${i}f${i}l${i}
 # Cleans up folder
 rm parametersw${i} parametersw${i}f${i}
-mv parametersw${i}f${i}l${i} parameters${i}
+mv parametersw${i}f${i}l${i} "$WD"/data/parameters-files/parameters${i}
 done
-# above works
 
-# Some other tries down here. 
-# cat input2d |  awk -v var="$variable" 'NR==7 {$0="WO = var   // Womersley number"} 1' input2d > input2d2  # This will replace a single line in input2d and copy it to input2d
-
-# cat input2d |  awk 'BEGIN {} { for(i=1; i <=5; i++)  NR==7 $0="WO = $i   // Womersley number" 1}' input2d > input2d2
-
-# awk 'BEGIN { print "START" } { for(i=1; i <=NR; i++) print i} END { print NR }' input2d
-
+rm pamp.txt 
+mv Freq.txt "$WD"/data/parameters/

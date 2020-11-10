@@ -1,33 +1,41 @@
-##### Top Cross, Um ####
+##### Connecting vessel, Y-component of Flow Speed (Uy) ####
 #
 # Instructions: Make the following edits:
 # 
-# Line 12: OpenDatabase: add file path to lag_data.visit
-# Line 17: OpenDatabase: add file path to dumps.visit
-# Line 87: File name: change file name for saving .curve file
+# Lines 16,21,92,117: Make sure your name is in the file path. 
+# 
+# Open terminal window in Bosque and paste: 
 #
-# Then copy and paste text into VisIt > Controls > Command... window and hit "Execute"
+# /Applications/VisIt.app/Contents/Resources/bin/visit -nowin -cli -s [script.py]
 #
+# Replace [script.py] with the name of this file
+#
+import sys
 
-for num in range(1,682):
+WDin=sys.argv[1]
+WDout=sys.argv[2]
+startnum=int(float(sys.argv[3]))
+endnum=int(float(sys.argv[4]))
 
-	OpenDatabase("localhost:/Users/Bosque/IBAMR/peri-gPC/newcode_runs/viz_IB2d"+str(num)+"/lag_data.visit", 0)
+for num in range(startnum,endnum):
+
+	OpenDatabase(str(WDin)+"/viz_IB2d"+str(num)+"/lag_data.visit", 0)
 	AddPlot("Mesh", "heart_race_512_vertices", 1, 0)
 	AddPlot("Mesh", "heart_tube_512_mesh", 1, 0)
 	AddPlot("Mesh", "heart_tube_512_vertices", 1, 0)
 	DrawPlots()
-	OpenDatabase("localhost:/Users/Bosque/IBAMR/peri-gPC/newcode_runs/viz_IB2d"+str(num)+"/dumps.visit", 0)
+	OpenDatabase(str(WDin)+"/viz_IB2d"+str(num)+"/dumps.visit", 0)
 	HideActivePlots()
-	AddPlot("Pseudocolor", "P", 1, 0)
+	AddPlot("Pseudocolor", "U_y", 1, 1)
 	AddOperator("Box", 0)
 	SetActivePlots(4)
 	SetActivePlots(4)
 	BoxAtts = BoxAttributes()
 	BoxAtts.amount = BoxAtts.Some  # Some, All
-	BoxAtts.minx = -0.23
-	BoxAtts.maxx = -0.22
-	BoxAtts.miny = -0.20
-	BoxAtts.maxy = -0.10
+	BoxAtts.minx = 0.31
+	BoxAtts.maxx = 0.41
+	BoxAtts.miny = -0.005
+	BoxAtts.maxy = 0.005
 	BoxAtts.minz = 0
 	BoxAtts.maxz = 1
 	BoxAtts.inverse = 0
@@ -85,9 +93,9 @@ for num in range(1,682):
 	SetActivePlots(2)
 	#HideActivePlots()
 	SaveWindowAtts = SaveWindowAttributes()
-	SaveWindowAtts.outputToCurrentDirectory = 1
-	SaveWindowAtts.outputDirectory = "/Users/Bosque/IBAMR/peri-gPC/newcode_runs/curvefiles"
-	SaveWindowAtts.fileName = "newcode"+str(num).zfill(3)+"_vena_P_max"
+	SaveWindowAtts.outputToCurrentDirectory = 0
+	SaveWindowAtts.outputDirectory = str(WDout)+"/sim"+str(num)
+	SaveWindowAtts.fileName = "connect_Uy_max"
 	SaveWindowAtts.family = 0
 	SaveWindowAtts.format = SaveWindowAtts.CURVE  # BMP, CURVE, JPEG, OBJ, PNG, POSTSCRIPT, POVRAY, PPM, RGB, STL, TIFF, ULTRA, VTK, PLY
 	SaveWindowAtts.width = 1024
@@ -110,9 +118,9 @@ for num in range(1,682):
 	SetActivePlots(1)
 	#HideActivePlots()
 	SaveWindowAtts = SaveWindowAttributes()
-	SaveWindowAtts.outputToCurrentDirectory = 1
-	SaveWindowAtts.outputDirectory = "/Users/Bosque/IBAMR/peri-gPC/newcode_runs/curvefiles"
-	SaveWindowAtts.fileName = "newcode"+str(num).zfill(3)+"_vena_P_avg"
+	SaveWindowAtts.outputToCurrentDirectory = 0
+	SaveWindowAtts.outputDirectory = str(WDout)+"/sim"+str(num)
+	SaveWindowAtts.fileName = "connect_Uy_avg"
 	SaveWindowAtts.family = 0
 	SaveWindowAtts.format = SaveWindowAtts.CURVE  # BMP, CURVE, JPEG, OBJ, PNG, POSTSCRIPT, POVRAY, PPM, RGB, STL, TIFF, ULTRA, VTK, PLY
 	SaveWindowAtts.width = 1024
@@ -134,8 +142,7 @@ for num in range(1,682):
 	DeleteAllPlots()
 	SetActiveWindow(1)
 	DeleteAllPlots()
-	
-exit()
 
+exit()
 
 

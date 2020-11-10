@@ -1,12 +1,15 @@
 #!/bin/bash
 
+WD=${1:?Provide a working directory}
+a=${2:?Provide a simulation set number}
+
 # Separate main parameter file into three files
-cut -f 1 allpara_165.txt > Wo.txt
+cut -f 1 "$WD"/data/parameters/allpara_${a}.txt > Wo.txt
 # cut -f 2 allpara.txt > pamp.txt
-cut -f 3 allpara_165.txt > Freq.txt
+cut -f 3 "$WD"/data/parameters/allpara_${a}.txt > Freq.txt
 
 # Count number of lines in files
-numlines=$(grep -c "^" allpara_165.txt)
+numlines=$(grep -c "^" "$WD"/data/parameters/allpara_${a}.txt)
 
 # initialize variables
 WO=0
@@ -23,9 +26,9 @@ Freq=$(awk -v var="$i" 'NR==var' Freq.txt)
 # Writes file to replace line with Freq
 awk -v var="$Freq" 'NR==5 {$0="FRE = "'"var"'"   // Pumping Frequency (Hz)"} 1' input2dw${i} > input2dw${i}f${i}
 # Edits input2d to create different IBlog and visit files and folders
-awk -v var="$i" 'NR==230 {$0="   log_file_name = \"runs/IB2d.log"'"var"'"\"                //"} 1' input2dw${i}f${i} > input2dw${i}f${i}l${i}
-awk -v var="$i" 'NR==236 {$0="   viz_dump_dirname = \"runs/viz_IB2d"'"var"'"\"                //"} 1' input2dw${i}f${i}l${i} > input2dw${i}f${i}l${i}y${i}
-awk -v var="$i" 'NR==245 {$0="   data_dump_dirname = \"runs/hier_data_IB2d"'"var"'"\"          //"} 1' input2dw${i}f${i}l${i}y${i} > input2dw${i}f${i}l${i}y${i}j${i}
+awk -v var="$i" 'NR==230 {$0="   log_file_name = \"../results/ibamr/log-files/IB2d.log"'"var"'"\"                //"} 1' input2dw${i}f${i} > input2dw${i}f${i}l${i}
+awk -v var="$i" 'NR==236 {$0="   viz_dump_dirname = \"../results/ibamr/runs/viz_IB2d"'"var"'"\"                //"} 1' input2dw${i}f${i}l${i} > input2dw${i}f${i}l${i}y${i}
+awk -v var="$i" 'NR==245 {$0="   data_dump_dirname = \"../results/ibamr/runs/hier_data_IB2d"'"var"'"\"          //"} 1' input2dw${i}f${i}l${i}y${i} > input2dw${i}f${i}l${i}y${i}j${i}
 test=$Freq
 echo $test
 if [ $(echo " $test <= 0.70" | bc) -eq 1 ]
@@ -40,18 +43,11 @@ fi
 
 # Cleans up folder
 rm input2dw${i} input2dw${i}f${i} input2dw${i}f${i}l${i} input2dw${i}f${i}l${i}y${i} input2dw${i}f${i}l${i}y${i}j${i}
-mv input2dw${i}f${i}l${i}y${i}j${i}t${i} input2d${i}
+mv input2dw${i}f${i}l${i}y${i}j${i}t${i} "$WD"/data/input2d-files/input2d${i}
 
 echo $i
-grep "END_TIME =" input2d${i}  && grep "FRE ="  input2d${i}
+#grep "END_TIME =" input2d${i}  && grep "FRE ="  input2d${i}
 
 done
-# above works
 
-# Some other tries down here. 
-# cat input2d |  awk -v var="$variable" 'NR==7 {$0="WO = var   // Womersley number"} 1' input2d > input2d2  # This will replace a single line in input2d and copy it to input2d
-
-# cat input2d |  awk 'BEGIN {} { for(i=1; i <=5; i++)  NR==7 $0="WO = $i   // Womersley number" 1}' input2d > input2d2
-
-# awk 'BEGIN { print "START" } { for(i=1; i <=NR; i++) print i} END { print NR }' input2d
-
+rm Freq.txt Wo.txt
