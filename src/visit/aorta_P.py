@@ -10,15 +10,21 @@
 #
 # Replace [script.py] with the name of this file
 #
+import sys
 
-for num in range(1,682):
+WDin=sys.argv[1]
+WDout=sys.argv[2]
+startnum=int(float(sys.argv[3]))
+endnum=int(float(sys.argv[4]))
 
-	OpenDatabase("localhost:/Users/Bosque/IBAMR/peri-gPC/newcode_runs/viz_IB2d"+str(num)+"/lag_data.visit", 0)
+for num in range(startnum,endnum):
+
+	OpenDatabase(str(WDin)+"/viz_IB2d"+str(num)+"/lag_data.visit", 0)
 	AddPlot("Mesh", "heart_race_512_vertices", 1, 0)
 	AddPlot("Mesh", "heart_tube_512_mesh", 1, 0)
 	AddPlot("Mesh", "heart_tube_512_vertices", 1, 0)
 	DrawPlots()
-	OpenDatabase("localhost:/Users/Bosque/IBAMR/peri-gPC/newcode_runs/viz_IB2d"+str(num)+"/dumps.visit", 0)
+	OpenDatabase(str(WDin)+"/viz_IB2d"+str(num)+"/dumps.visit", 0)
 	HideActivePlots()
 	AddPlot("Pseudocolor", "P", 1, 0)
 	AddOperator("Box", 0)
@@ -87,9 +93,9 @@ for num in range(1,682):
 	SetActivePlots(2)
 	#HideActivePlots()
 	SaveWindowAtts = SaveWindowAttributes()
-	SaveWindowAtts.outputToCurrentDirectory = 1
-	SaveWindowAtts.outputDirectory = "localhost:/Users/Bosque/IBAMR/peri-gPC/newcode_runs/curvefiles/"
-	SaveWindowAtts.fileName = "newcode"+str(num).zfill(3)+"_aorta_P_max"
+	SaveWindowAtts.outputToCurrentDirectory = 0
+	SaveWindowAtts.outputDirectory = str(WDout)+"/sim"+str(num)
+	SaveWindowAtts.fileName = "aorta_P_max"
 	SaveWindowAtts.family = 0
 	SaveWindowAtts.format = SaveWindowAtts.CURVE  # BMP, CURVE, JPEG, OBJ, PNG, POSTSCRIPT, POVRAY, PPM, RGB, STL, TIFF, ULTRA, VTK, PLY
 	SaveWindowAtts.width = 1024
@@ -112,9 +118,9 @@ for num in range(1,682):
 	SetActivePlots(1)
 	#HideActivePlots()
 	SaveWindowAtts = SaveWindowAttributes()
-	SaveWindowAtts.outputToCurrentDirectory = 1
-	SaveWindowAtts.outputDirectory = "/Users/Bosque/IBAMR/peri-gPC/newcode_runs/curvefiles"
-	SaveWindowAtts.fileName = "newcode"+str(num).zfill(3)+"_aorta_P_avg"
+	SaveWindowAtts.outputToCurrentDirectory = 0
+	SaveWindowAtts.outputDirectory = str(WDout)+"/sim"+str(num)
+	SaveWindowAtts.fileName = "aorta_P_avg"
 	SaveWindowAtts.family = 0
 	SaveWindowAtts.format = SaveWindowAtts.CURVE  # BMP, CURVE, JPEG, OBJ, PNG, POSTSCRIPT, POVRAY, PPM, RGB, STL, TIFF, ULTRA, VTK, PLY
 	SaveWindowAtts.width = 1024
