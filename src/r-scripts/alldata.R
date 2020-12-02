@@ -1,25 +1,34 @@
-## Processes all runs for pressure, Um, Ux, and Uy. 
-#
+#################################################################################################################
+#################################################################################################################
+###
+### Average, max, and pressure calculations
+###
+#################################################################################################################
 
 #### Parameter definitions ####
+track <- "branch"         # Options: "racetrack", "branch", "obstacles", "branchandobstacles"
 n <- 165
-num <- 3
-track <- "obstacles"         # Options: "racetrack", "branch", "obstacles", "branchandobstacles"
 
+# Parameters that should not change
 outputs <- c("aorta_Um", "aorta_Ux",
              "connect_Um", "connect_Uy", 
              "vena_Um", "vena_Ux",
              "aorta_P", "vena_P")
 types <- c("avg","max")
 
+# Loading parameter file
 parameters <- read.table(paste("./data/parameters/allpara_", n, ".txt", sep = ""), sep = "\t")
 # allocate space
-allofit <- matrix(0, n, length(outputs) * length(types) + 5)
+allofit <- matrix(NA, n, length(outputs) * length(types) + 5)
 allofit[, 1] <- seq(1,n)
 allofit[, 2] <- parameters$V1
 allofit[, 3] <- parameters$V2
 allofit[, 4] <- parameters$V3
 parameter_names<-c("Wo", "CR", "Freq")
+
+# Checks for and makes new directory for time series data
+dir.create(file.path(paste("./results/r-csv-files/", track, "_results", sep = ""),
+                     "time-series/"), showWarnings = FALSE)
 
 #### Function definitions ####
 get.data <- function(i, track, output, type){
@@ -28,8 +37,8 @@ get.data <- function(i, track, output, type){
   return(data)
 }
 
-#### Main loop #### 
-for (i in 1:num){
+#### Main analysis loop #### 
+for (i in 1:n){
   print(paste("Simulation:",i))
   sample_data <- get.data(i, track, outputs[1], types[1])
   allofit_ts <- matrix(0, length(sample_data$V1), length(outputs) * length(types) + 1)
@@ -55,12 +64,21 @@ for (i in 1:num){
   allnames <- c("time",legend_names)
   colnames(allofit_ts) <- allnames
   write.table(allofit_ts, file = paste("./results/r-csv-files/", 
-                                    track, "_results/time_series_sim", i, ".csv", sep = ""),
+                                    track, "_results/time-series/alldata_ts_sim", i, "_", Sys.Date(),".csv", sep = ""),
               sep = ",", row.names = FALSE, col.names = TRUE)
 }
 allnames2 <- c("number", parameter_names, legend_names, "delta_P")
 colnames(allofit) <- allnames2
-write.table(allofit, file = paste("./results/r-csv-files/", 
-                                  track, "_results/combined_data_", track, "_", num, "_", Sys.Date(), ".csv", sep = ""), 
-            sep = ",", row.names = FALSE, col.names = TRUE)
 
+#### Checking and Saving Data ####
+complete<-as.numeric(sum(is.na(allofit)))
+message("~.*^*~Completeness check~*^*~.~\n",
+        "Number of NAs: ", complete)
+if (complete==0){
+  message("Set complete. Saving now!")
+  write.table(allofit, file = paste("./results/r-csv-files/", 
+                                    track, "_results/combined_data_", track, "_", n, "_", Sys.Date(), ".csv", sep = ""), 
+              sep = ",", row.names = FALSE, col.names = TRUE)
+} else {
+  message("Set not complete, did not save")
+}
