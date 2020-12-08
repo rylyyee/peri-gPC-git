@@ -1,56 +1,79 @@
-# Clears any previous data
-rm(list=ls())
+#################################################################################################################
+#################################################################################################################
+###
+### Velocity profile calculations
+###
+#################################################################################################################
 
-# Sets working directory
-setwd("/Users/Bosque/IBAMR/peri-gPC/newcode_runs/curvefiles")
 
-#Setting up numbers for name convention
-s1<- "newcode"
-n<-681
-num<-seq(1,n)
-#num<-sprintf("%03d", num)
+#### Parameters ####
+track <- "branch"   # Options: "racetrack", "branch", "obstacles", "branchandobstacles"
+n <- 165
 
-#Define parameters
-sub<-12		# Number of initial time steps to ignore
-d0=0.1		# Diameter of tube
-Qall<-matrix(0,n,1)
+# Parameters that should not change
+output <- "Um_profile"
+type_base <- "profile"
+dt <- 1e-5
+print_time <- 10000
+sub <- 5		# Number of initial time steps to ignore
+d0 <- 0.1		# Diameter of tube
+Qall<-matrix(NA,n,1)  # Allocates space
+
+# Loading parameter files
+parameters <- read.table(paste("./data/parameters/allpara_", n, ".txt", sep = ""), sep = "\t")
+parameter_names <- c("Wo", "CR", "Freq")
+colnames(parameters) <- parameter_names
+
+#### Main analysis ####
+
+# Checks for and makes new directory for time series data
+dir.create(file.path(paste("./results/r-csv-files/", track, "_results", sep = ""),
+                     "time-series/"), showWarnings = FALSE)
 
 for (k in 1:n){
-	
-	# Sets working directory
-	wd<-paste("/Users/Bosque/IBAMR/peri-gPC/newcode_runs/curvefiles/",s1,num[k],"_profiles/",sep="")
-	setwd(wd)
-	# Displays the current working directory.
-	getwd()
+  
+  print(paste("Simulation:", k))
 	# Gets file list.
-	f<-list.files(path=".",all.files=FALSE)
-	# Sets number of time steps based on number of files.
-	ts<-length(f)
+	f <- list.files(path=paste("./results/visit/", track, "_runs/sim", k, "/", sep = ""),
+	                pattern = output,
+	                all.files=FALSE)
+	ts<-length(f) # Sets number of time steps based on number of files.
+	Qts<-matrix(NA, ts, 2) # allocates space for flow rates
+	colnames(Qts) <- c("time", "Q")
+	Qts[, 1] <- seq(0,by = dt*print_time, length.out = ts)
 	
-	# allocates space for flow rates
-	Qts<-matrix(0,ts,1)
-		
 	for (i in 1:length(f)){
-			
-		data <- read.table(f[i]) 	# Loads data for time step
-		s2<-dim(data)[1]			# Sets size of data file
-		dr<-d0/s2					# Sets distance between data points
-		q<-matrix(0,s2-1,1)			# allocates space for individual time step
-		for (j in 1:(s2-1)){
-				A<-0.5*pi*((d0-dr*(j-1))-(d0-dr*j)) # calculates concentric circle
-				q[j]<-A*data[j,2]					# calculates volume flow for each circle
+		data <- read.table(paste("./results/visit/", 
+		                         track, "_runs/sim", k, "/", f[i], sep = "")) 	# Loads data for time step
+		s2 <- dim(data)[1]			# Sets size of data file
+		dr <- d0/s2					# Sets distance between data points
+		q <- matrix(0, s2 - 1, 1)			# allocates space for individual time step
+		for (j in 1:(s2 - 1)){
+				A <- 0.5*pi*((d0 - dr*(j - 1)) - (d0 - dr*j)) # calculates concentric circle
+				q[j] <- A*data[j, 2]					# calculates volume flow for each circle
 		}
-		
-		Qts[i]<-sum(q)				# sums individual volume flows for time step
-		
+		Qts[i,2] <- sum(q)				# sums individual volume flows for time step
 	}
-
-	Qall[k]<-mean(Qts[sub:ts])			# Calculates mean across simulation
+	complete<-as.numeric(sum(is.na(Qts)))
+	write.table(Qts, file = paste("./results/r-csv-files/", track, "_results/time-series/Qts_profile_", k,
+	                                "_", Sys.Date(), ".csv", sep = ""), sep = ",", row.names = FALSE)
+	Qall[k] <- mean(Qts[sub:ts])			# Calculates mean across simulation
 	rm(Qts)
 }
-	plot(Qall)						# Plots data for each simulation
-	setwd("/Users/Bosque/IBAMR/peri-gPC/newcode_runs/curvefiles")
-	write.csv(Qall,file=paste(s1,"_Um_Q.csv",sep=""))	#Saves data for each simulation
 
+# Sets up Qall in data frame
+Qall2 <- data.frame(parameters, Qall)
+
+#### Checking and Saving Data ####
+complete<-as.numeric(sum(is.na(Qall2)))
+message("~.*^*~Completeness check~*^*~.~\n",
+        "Number of NAs: ",complete)
+if (complete==0){
+  message("Set complete. Saving now!")
+  write.table(Qall2, file = paste("./results/r-csv-files/", track, "_results/Qall_", n,
+                                  "_", Sys.Date(), ".csv", sep = ""), sep = ",")
+} else {
+  message("Set not complete, did not save")
+}
 
 

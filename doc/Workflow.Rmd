@@ -78,13 +78,57 @@ There are two files in `src/bridges` that control submitting batch jobs to the B
 
 Each simulation takes between 5 and 7 hours to run on Bridges as it is currently configured. However, should you wish to change parameters, lines 2 through 6 in `runperi.job` set out options passed to SLURM during submission. All other aspects of the file have already been updated when `compile_heart.sh` was run. 
 
-After altering these, you can run any number in a series of simulations at one time using `setrunperijobs.sh`. In command-line bash, simply provide the start number as the first number after the shell script and the end number as the second. In this example, simulations 1 through 20 are started using sbatch:
+After altering these, you can run any number in a series of simulations at one time using `setrunperijobs.sh`. In command-line bash, simply provide the start number as the first number after the shell script and the end number as the second. In this example, simulations 1 through 20 are started using `sbatch`:
 
 `$ sh setrunperijobs.sh 1 20`
 
 When these runs have finished successfully, the viz_IB2d files are automatically zipped and will be deposited in `results/runs`. Log files will be located in `results/log-files`. It is recommended that you move completed simulation directory `results/ibamr/runs` to `results/ibamr/track_runs` (where track is the name of the circulatory system you used) in keeping with the structure of the project. 
 
 ## 5. Execution of VisIt data analysis scripts
+
+### Check for simulation set completeness
+
+Each simulation needs to be complete before the VisIt script will run successfully. In order to check runs, in the `src/visit` folder, run: 
+
+`$ sh checkruns.sh "$WD" track n`
+
+where `WD` is the top working directory, `track` is the name of your racetrack, and `n` is the number of simulatinos to check. This should produce a list of simulations not found or that are incomplete (it returns simulation not found for both situations).
+
+### Execute VisIt Scripts
+
+To execute the python script, use the shell script `bashpy.sh` in the folder `src/visit` through command-line bash:
+
+`$ sh bashpy.sh "$WD" track s e`
+
+where `WD` is the top working directory, `track` is the name of your racetrack, `s` is the start number of you simulation set and `e` is the end number. For instance, if you'd like to run all simulations for the branch and obstacles track, from `src/visit` you would enter: `sh bashpy.sh "$WD" branchandobstacles 1 165`. 
+
+The script will deposit curve files in `results/visit/{track}_runs/sim{i}/`. A number of files will be produced for each simulation. This script needs to be run only once. 
+
+### Checking for VisIt results completeness
+
+To check the visit result curve files, which are needed for the R scripts in the next steps, run the following in `src/visit`: 
+
+`$ sh checkvisitresults.sh "$WD" track n`
+
+where `WD` is the top working directory, `track` is the name of your racetrack, and `n` is the number of simulations in the set. The script will output a list of the specific files that are missing in each simulation, including stand-alone files and time-series files. 
+
+## 6. Execute final R scripts to calculate results
+
+Two scripts need to be run to produce the final csv files with calculated results. These are the `alldata.R`, which uses individual curve files, and `vel_profile.R` files, which uses time-series data. 
+
+In both R scripts, you will need to change the value for `track` to your circulatory system and the value of `n` to the number of simulations in your set.
+
+For the all data file, in the top working directory, run R and enter: 
+
+`> setwd(getwd())`
+`> source('src/r-scripts/alldata.R')`
+
+For the velocity profile file, enter next: 
+
+`> source('src/r-scripts/vel_profile.R')`
+
+This will produce a folder with time series data for each simulation and some combined results of Q and other measures of fluid flow in the circulatory system. 
+
 
 
 

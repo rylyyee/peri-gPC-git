@@ -30,7 +30,7 @@ rm input2d${i} parameters${i}
 
 Freq=$(awk -v var="$i" 'NR==var' "${WD}"/data/parameters/Freq.txt)
 
-cd "${WD}"/results/runs/
+cd "${WD}"/results/ibamr/runs/
 if [ $(echo " $test <= 0.70" | bc) -eq 1 ]
 then
 test -d viz_IB2d${i}/lag_data.cycle_35000 && zip -r viz_IB2d${i}.zip viz_IB2d${i}/;zip -r hier_data_IB2d${i}.zip hier_data_IB2d${i}/ || echo "Simulation failed"
