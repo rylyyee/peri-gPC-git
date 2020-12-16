@@ -225,7 +225,7 @@ for k=starting_time:time_step:final_time
     
     % Points to FileID for Specific Timestep
     if k < 10000
-        fileID =  fopen(strcat(paths.hier_folder, 'F.0', num2str(k)));  %This line opens the file of interest and gives it an FileID #
+    fileID =  fopen(strcat(paths.hier_folder, 'F.0', num2str(k)));  %This line opens the file of interest and gives it an FileID #
         fileID2 = fopen(strcat(paths.hier_folder, 'X.0', num2str(k)));
     else
         fileID =  fopen(strcat(paths.hier_folder, 'F.', num2str(k)));  %This line opens the file of interest and gives it an FileID #

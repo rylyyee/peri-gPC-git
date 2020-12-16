@@ -10,7 +10,7 @@ paths.results = strcat(topdir, '/results/matlab-csv-files/',track,'_results/');
 allpara = load(strcat(paths.parameter, 'allpara_',num2str(setparas),'.txt'));
 
 n = length(allpara);
-n=3;
+%n=3;
 cost = zeros(n,2);
 
 for run = 1:n
