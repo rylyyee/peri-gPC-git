@@ -10,86 +10,271 @@ library(reshape2)
 library(viridis)
 library(ggplot2)
 library(cowplot)
+library(scales)
 
 source("../src/r-scripts/data_handling_functions.R")
 
-branch.data <- loadflowdata("branch","2020-12-09")
-branch.melted <- melt(branch.data, id.vars = c("number", "Wo", "CR", "Freq"))
+racetrack.flowdata <- loadflowdata("racetrack","2020-12-23")
+racetrack.costdata <- loadcostdata("racetrack","21-Dec-2020")
+racetrack.data <- combinedata(racetrack.flowdata, racetrack.costdata)
+
+branch.flowdata <- loadflowdata("branch","2020-12-09")
+branch.costdata <- NA
+#branch.costdata <- loadcostdata("branch","21-Dec-2020")
+branch.data <- combinedata(branch.flowdata, branch.costdata)
+
+branchandobstacles.flowdata <- loadflowdata("branchandobstacles", "2020-12-20")
+branchandobstacles.costdata <- loadcostdata("branchandobstacles", "21-Dec-2020")
+branchandobstacles.data <- combinedata(branchandobstacles.flowdata, 
+                                       branchandobstacles.costdata)
+
+#obstacles.flowdata <- loadflowdata("obstacles","2020-12-20")
+#obstacles.costdata <- loadcostdata("obstacles","21-Dec-2020")
+#obstacles.data <- combinedata(obstacles.flowdata, obstacles.costdata)
+
+
+data <- list("racetrack" = racetrack.data, "branch" = branch.data, "branchandobstacles" = branchandobstacles.data)
+tracklist<-c("racetrack", "branch", "branchandobstacles")
+alldata <- combinetracks(data, tracklist)
+alldata.melted <- melt(alldata, id.vars = c("number","Wo","CR","Freq","track"))
 
 ```
 
-
-## Branch plots
+## Plots of tracks
 
 ```{r echo=FALSE}
+plot.racetrack <- plot.track("racetrack")
+plot.branch <- plot.track("branch")
+plot.obstacles <- plot.track("obstacles")
+plot.branchandobstacles <- plot.track("branchandobstacles")
+pts.size = 0.25
 
-branch.Um <- subset(branch.melted, grepl("Um_avg", branch.melted$variable))
-Um.CR <- ggplot(branch.Um, aes(x = CR, y = value, color = variable)) + geom_point() +
-  xlab("CR") + ylab("Dimensionless fluid speed") + 
-  scale_color_viridis(name = "Average Um", discrete = TRUE, 
-                      labels = c("aorta","connect","vena cava")) + 
-  theme_bw() + theme(legend.position = c(0.4,0.8))
+racetrack <- ggplot(plot.racetrack[["race"]], aes(x, y)) + geom_point(size = pts.size) +
+  ggtitle("Racetrack") +
+  geom_point(data = plot.racetrack[["tube"]], mapping = aes(x, y), 
+             size = pts.size, color = "blue") +
+  theme_bw()
 
-Um.Freq <- ggplot(branch.Um, aes(x = Freq, y = value, color = variable)) + geom_point() +
-  xlab("Frequency") + ylab("Dimensionless fluid speed") + 
-  scale_color_viridis(name = "Average Um", discrete = TRUE, 
-                      labels = c("aorta","connect","vena cava")) + 
+branch <- ggplot(plot.branch[["race"]], aes(x, y)) + geom_point(size = pts.size) +
+  ggtitle("Branch") + 
+  geom_point(data = plot.branch[["tube"]], mapping = aes(x, y), 
+             size = pts.size, color = "blue") +
+  theme_bw()
+  
+obstacles <- ggplot(plot.obstacles[["race"]], aes(x, y)) + geom_point(size = pts.size) +
+  ggtitle("Obstacles") + 
+  geom_point(data = plot.obstacles[["tube"]], mapping = aes(x, y), 
+             size = pts.size, color = "blue") +
+  theme_bw()
+  
+branchandobstacles <- ggplot(plot.branchandobstacles[["race"]], aes(x, y)) + 
+  geom_point(size = pts.size) + ggtitle("Branch and Obstalces") +
+  geom_point(data = plot.branchandobstacles[["tube"]], mapping = aes(x, y), 
+             size = pts.size, color = "blue") +
+  theme_bw()
+
+#png(filename = "tracks.png", width = 5, height = 4, units = "in", res = 600)
+plot_grid(racetrack, branch, obstacles, branchandobstacles, nrow = 2)
+#dev.off()
+```
+
+## Um and Q
+
+```{r echo=FALSE, warning=FALSE}
+
+Um <- subset(alldata.melted, grepl("connect_Um_avg", alldata.melted$variable))
+Q <- subset(alldata.melted, grepl("Q", alldata.melted$variable))
+
+Um.CR <- ggplot(Um, aes(x = CR, y = value, color = track)) + 
+  geom_point(size = 4) +
+  xlab("CR") + ylab("Fluid speed") + 
+  scale_color_viridis(name = "Track configuration", discrete = TRUE, option="D",
+                      labels = c("Racetrack", "Branch", "Branch and Obstacles")) + 
+  theme_bw() + theme(legend.position = "bottom")
+
+leg.all<-get_legend(Um.CR)
+
+Um.CR <- ggplot(Um, aes(x = CR, y = value, color = track)) + geom_point() +
+  xlab("CR") + ylab("Fluid speed") + 
+  scale_color_viridis(discrete = TRUE, option="D") + 
   theme_bw() + theme(legend.position = "none")
 
-Um.Wo <- ggplot(branch.Um, aes(x = Wo, y = value, color = variable)) + geom_point() +
-  xlab("Womersley number") + ylab("Dimensionless fluid speed") + 
-  scale_color_viridis(name = "Average Um", discrete = TRUE, 
-                      labels = c("aorta","connect","vena cava")) + 
+Um.Freq <- ggplot(Um, aes(x = Freq, y = value, color = track)) + geom_point() +
+  xlab("Frequency") + ylab("Fluid speed") + 
+  scale_color_viridis(discrete = TRUE, option="D") + 
   theme_bw() + theme(legend.position = "none")
 
-plot_grid(Um.CR, Um.Freq, Um.Wo, nrow = 1)
+Um.Wo <- ggplot(Um, aes(x = Wo, y = value, color = track)) + geom_point() +
+  xlab("Womersley number") + ylab("Fluid speed") + 
+  scale_color_viridis(discrete = TRUE, option="D") + 
+  theme_bw() + theme(legend.position = "none")
 
+Q.CR <- ggplot(Q, aes(x = CR, y = value, color = track)) + geom_point() +
+  xlab("CR") + ylab("Volume flow rate") + 
+  scale_color_viridis(discrete = TRUE, option="D") + ylim(0,3) +
+  theme_bw() + theme(legend.position = "none")
+
+Q.Freq <- ggplot(Q, aes(x = Freq, y = value, color = track)) + geom_point() +
+  xlab("Frequency") + ylab("Volume flow rate") + 
+  scale_color_viridis(discrete = TRUE, option="D") + ylim(0,3) +
+  theme_bw() + theme(legend.position = "none")
+
+Q.Wo <- ggplot(Q, aes(x = Wo, y = value, color = track)) + geom_point() +
+  xlab("Womersley number") + ylab("Volume flow rate") + 
+  scale_color_viridis(discrete = TRUE, option="D") + ylim(0,3) +
+  theme_bw() + theme(legend.position = "npne")
+
+
+#png(filename = "Um-Q.png", height = 9, width = 6, units = "in", res = 600)
+plot_grid(Um.CR, Q.CR, Um.Freq, Q.Freq, Um.Wo, Q.Wo, nrow = 3)
+#dev.off()
+#png(filename = "legend.png", height = 2, width = 5, units = "in", res = 600)
+#plot_grid(leg.all)
+#dev.off()
+#png(filename = "Um.png", height = 3, width = 8, units = "in", res = 600)
+plot_grid(Um.CR, Um.Freq, Um.Wo, nrow=1)
+#dev.off()
+#png(filename = "Q.png", height = 3, width = 8, units = "in", res = 600)
+plot_grid(Q.CR, Q.Freq, Q.Wo, nrow=1)
+#dev.off()
+```
+
+## Pressure
+
+```{r echo = FALSE, warning=FALSE}
+Pavg <- subset(alldata.melted, grepl("P_avg", alldata.melted$variable))
+DeltaP <- subset(alldata.melted, grepl("delta_P", alldata.melted$variable))
+
+Pavg.CR <- ggplot(Pavg, aes(x = CR, y = value, 
+                            shape = variable, color = track)) + 
+  geom_point() +
+  xlab("CR") + ylab("Pressure") + 
+  scale_color_viridis(discrete = TRUE, option="D") + 
+  theme_bw() + theme(legend.position = "none")
+
+Pavg.Freq <- ggplot(Pavg, aes(x = Freq, y = value, shape = variable, color = track)) + 
+  geom_point() +
+  xlab("Frequency") + ylab("Pressure") + 
+  scale_color_viridis(discrete = TRUE, option="D") + 
+  theme_bw() + theme(legend.position = "none")
+
+Pavg.Wo <- ggplot(Pavg, aes(x = Wo, y = value, shape = variable, color = track)) + 
+  geom_point() +
+  xlab("Womersley number") + ylab("Pressure") + 
+  scale_color_viridis(discrete = TRUE, option="D") + 
+  theme_bw() + theme(legend.position = "none")
+
+DeltaP.CR <- ggplot(DeltaP, aes(x = CR, y = value, shape = variable, color = track)) + 
+  geom_point() +
+  xlab("CR") + ylab(expression(Delta*"P")) + 
+  scale_color_viridis(discrete = TRUE, option="D") + 
+  theme_bw() + theme(legend.position = "none")
+
+DeltaP.Freq <- ggplot(DeltaP, aes(x = Freq, y = value, shape = variable, color = track)) + 
+  geom_point() +
+  xlab("Frequency") + ylab(expression(Delta*"P")) + 
+  scale_color_viridis(discrete = TRUE, option="D") + 
+  theme_bw() + theme(legend.position = "none")
+
+DeltaP.Wo <- ggplot(DeltaP, aes(x = Wo, y = value, shape = variable, color = track)) + 
+  geom_point() +
+  xlab("Womersley number") + ylab(expression(Delta*"P")) + 
+  scale_color_viridis(discrete = TRUE, option="D") + 
+  theme_bw() + theme(legend.position = "none")
+
+#png(filename = "Pavg-DeltaP.png", height = 9, width = 6, units = "in", res = 600)
+plot_grid(Pavg.CR, DeltaP.CR, Pavg.Freq, DeltaP.Freq, Pavg.Wo, DeltaP.Wo, nrow = 3)
+#dev.off()
 ```
 
 
-```{r echo=TRUE}
-branch.Pavg <- subset(branch.melted, grepl("P_avg", branch.melted$variable))
-P.CR <- ggplot(branch.Pavg, aes(x = CR, y = value, color = variable)) + geom_point() +
-  xlab("CR") + ylab("Dimensionless fluid speed") + 
-  scale_color_viridis(name = "Avg P", discrete = TRUE, 
-                      labels = c("aorta","vena cava")) + 
-  theme_bw() + theme(legend.position = c(0.4,0.8))
 
-P.Freq <- ggplot(branch.Pavg, aes(x = Freq, y = value, color = variable)) + geom_point() +
-  xlab("Frequency") + ylab("Dimensionless fluid speed") + 
-  scale_color_viridis(name = "Avg P", discrete = TRUE, 
-                      labels = c("aorta","connect","vena cava")) + 
+## COT and Work
+
+```{r echo=FALSE, warning=FALSE, message=FALSE}
+COT <- subset(alldata.melted, grepl("COT", alldata.melted$variable))
+Work <- subset(alldata.melted, grepl("Work", alldata.melted$variable))
+
+COT.CR <- ggplot(COT, aes(x = CR, y = value, color = track)) + 
+  geom_point() + geom_smooth(aes(fill = track))+
+  xlab("CR") + ylab("log COT") + 
+  scale_color_viridis(discrete = TRUE, option="D") + 
+  scale_fill_viridis(discrete = TRUE, option="D") + 
+  scale_y_continuous(trans=log10_trans()) +
   theme_bw() + theme(legend.position = "none")
 
-P.Wo <- ggplot(branch.Pavg, aes(x = Wo, y = value, color = variable)) + geom_point() +
-  xlab("Womersley number") + ylab("Dimensionless fluid speed") + 
-  scale_color_viridis(name = "Avg P", discrete = TRUE, 
-                      labels = c("aorta","connect","vena cava")) + 
+COT.Freq <- ggplot(COT, aes(x = Freq, y = value, color = track)) + 
+  geom_point() +  geom_smooth(aes(fill = track))+
+  xlab("Frequency") + ylab("log COT") +
+  scale_color_viridis(discrete = TRUE, option="D") + 
+  scale_fill_viridis(discrete = TRUE, option="D") + 
+  scale_y_continuous(trans=log10_trans()) +
   theme_bw() + theme(legend.position = "none")
 
-plot_grid(P.CR, P.Freq, P.Wo, nrow = 1)
+COT.Wo <- ggplot(COT, aes(x = Wo, y = value, color = track)) + 
+  geom_point() + geom_smooth(aes(fill = track))+
+  xlab("Womersley number") +ylab("log COT") +
+  scale_color_viridis(discrete = TRUE, option="D") + 
+  scale_fill_viridis(discrete = TRUE, option="D") + 
+  scale_y_continuous(trans=log10_trans()) +
+  theme_bw() + theme(legend.position = "none")
+
+Work.CR <- ggplot(Work, aes(x = CR, y = value, color = track)) + 
+  geom_point() +
+  xlab("CR") + ylab("Work") + 
+  scale_color_viridis(discrete = TRUE, option="D") + 
+  theme_bw() + theme(legend.position = "none")
+
+Work.Freq <- ggplot(Work, aes(x = Freq, y = value, color = track)) + 
+  geom_point() +
+  xlab("Frequency") + ylab("Work") + 
+  scale_color_viridis(discrete = TRUE, option="D") + 
+  theme_bw() + theme(legend.position = "none")
+
+Work.Wo <- ggplot(Work, aes(x = Wo, y = value, color = track)) + 
+  geom_point() + 
+  xlab("Womersley number") + ylab("Work") + 
+  scale_color_viridis(discrete = TRUE, option="D") + 
+  theme_bw() + theme(legend.position = "none")
+
+#png(filename = "COT-work.png", height = 9, width = 6, units = "in", res = 600)
+plot_grid(COT.CR, Work.CR, COT.Freq, Work.Freq, COT.Wo, Work.Wo, nrow = 3)
+#dev.off()
+
+#png(filename = "COT.png", height = 3, width = 8, units = "in", res = 600)
+plot_grid(COT.CR, COT.Freq, COT.Wo, nrow=1)
+#dev.off()
 ```
 
 
-```{r echo=TRUE}
-branch.Upart_max <- subset(branch.melted, grepl("U*_avg", branch.melted$variable))
-Um.CR <- ggplot(branch.Um_max, aes(x = CR, y = value, color = variable)) + geom_point() +
-  xlab("CR") + ylab("Dimensionless fluid speed") + 
-  scale_color_viridis(name = "Max Um", discrete = TRUE, 
-                      labels = c("aorta","connect","vena cava")) + 
-  theme_bw() + theme(legend.position = c(0.4,0.8))
+## Overall COT
 
-Um.Freq <- ggplot(branch.Um_max, aes(x = Freq, y = value, color = variable)) + geom_point() +
-  xlab("Frequency") + ylab("Dimensionless fluid speed") + 
-  scale_color_viridis(name = "Max Um", discrete = TRUE, 
-                      labels = c("aorta","connect","vena cava")) + 
+```{r echo=FALSE, warning=FALSE}
+Work.violin <- ggplot(alldata, aes(x = track, y = Work, fill = track)) + 
+  geom_violin(color="gray20") + 
+  stat_summary(fun = "mean", color = "black", fill = "white", 
+               pch = 21, size = 1.25) +
+  scale_fill_viridis(name="", discrete = TRUE) + 
+  theme_bw() +theme(legend.position = "none")
+
+leg.all<-get_legend(Work.violin)
+
+Work.violin <- ggplot(alldata, aes(x = track, y = Work, fill = track)) + 
+  geom_violin(color="gray20") + xlab(" ") +
+  stat_summary(fun = "mean", color = "black", fill = "white", 
+               pch = 21, size = 1.25) +
+  scale_fill_viridis(name="", discrete = TRUE) + 
+  theme_bw() +theme(legend.position = "none")
+
+COT.violin <- ggplot(alldata, aes(x = track, y = COT, fill = track)) + 
+  geom_violin(color="gray20") + xlab(" ") + ylab("log COT") +
+  stat_summary(fun = "mean", color = "black", fill = "white", 
+               pch = 21, size = 1.25) +
+  scale_fill_viridis(name="", discrete = TRUE, labels = c("Branch and Obstacles", "Racetrack")) + 
+  scale_y_continuous(trans=log10_trans()) +
   theme_bw() + theme(legend.position = "none")
 
-Um.Wo <- ggplot(branch.Um_max, aes(x = Wo, y = value, color = variable)) + geom_point() +
-  xlab("Womersley number") + ylab("Dimensionless fluid speed") + 
-  scale_color_viridis(name = "Max Um", discrete = TRUE, 
-                      labels = c("aorta","connect","vena cava")) + 
-  theme_bw() + theme(legend.position = "none")
-
-plot_grid(Um.CR, Um.Freq, Um.Wo, nrow = 1)
+#png(filename = "work-cot-violin.png", width=9, height=4.5, units="in", res=600)
+plot_grid(Work.violin, COT.violin, nrow=1)
+#dev.off()
 ```
