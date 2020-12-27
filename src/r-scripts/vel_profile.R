@@ -7,7 +7,7 @@
 
 
 #### Parameters ####
-track <- "branch"   # Options: "racetrack", "branch", "obstacles", "branchandobstacles"
+track <- "obstacles"   # Options: "racetrack", "branch", "obstacles", "branchandobstacles"
 n <- 165
 
 # Parameters that should not change
@@ -15,7 +15,7 @@ output <- "Um_profile"
 type_base <- "profile"
 dt <- 1e-5
 print_time <- 10000
-sub <- 5		# Number of initial time steps to ignore
+sub <- 6		# Number of initial time steps to ignore, racetrack: 12, others: 6
 d0 <- 0.1		# Diameter of tube
 Qall<-matrix(NA,n,1)  # Allocates space
 
@@ -27,7 +27,7 @@ colnames(parameters) <- parameter_names
 #### Main analysis ####
 
 # Checks for and makes new directory for time series data
-dir.create(file.path(paste("./results/r-csv-files/", track, "_results", sep = ""),
+dir.create(file.path(paste("./results/r-csv-files/", track, "_results/", sep = ""),
                      "time-series/"), showWarnings = FALSE)
 
 for (k in 1:n){

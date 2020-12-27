@@ -17,7 +17,7 @@ for run = 1:n
     
     if allpara(run, 3)<=0.7 
         endtime=350000;
-    elseif allpara(run,3)<1.0
+    elseif allpara(run, 3)<1.0
         endtime=300000;
     else
         endtime=250000;

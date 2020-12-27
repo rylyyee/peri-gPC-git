@@ -3,7 +3,8 @@
 # Note: you must create destination folders before beginning! 
 #
 import sys
-
+import gc
+gc.enable()
 WDin=sys.argv[1]
 WDout=sys.argv[2]
 startnum=int(float(sys.argv[3]))
