@@ -1,0 +1,30 @@
+#!/bin/bash
+#SBATCH -p RM-shared
+#SBATCH -t 12:00:00
+#SBATCH -N 1
+#SBATCH --ntasks-per-node=1
+#SBATCH --mail-type=ALL
+#SBATCH -C EGRESS
+
+# echo commands to stdout
+set -x 
+
+# Set simulation set number
+sim=165
+
+# Set track
+track=\'branch\'
+
+# Set path 
+WD=/pylon5/bi561lp/lwaldrop/peri-gPC-git
+MatWD=\'$WD\'
+
+# move to working directory
+cd "${WD}"/src/matlab
+
+# add appropriate modules
+module load matlab
+
+# run matlab program
+matlab -r "runall_cost(${MatWD},${track},$sim);exit"
+

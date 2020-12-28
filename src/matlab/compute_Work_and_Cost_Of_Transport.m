@@ -27,7 +27,7 @@
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function [COT_Sim,Work_Sim] = compute_Work_and_Cost_Of_Transport(run,finish)
+function [COT_Sim,Work_Sim] = compute_Work_and_Cost_Of_Transport(paths, run,finish)
 
 % Characteristic Length Scale
 L = 0.1;            % Characteristic length scale (width of tube?) of system for COT  (line 129)
@@ -40,22 +40,22 @@ plot_Flag = 0;    % 1=yes, 0=no
 
 
 % DATA ANALYSIS INFO %
-start=20000;                              % 1ST interval # included in data analysis
+start=10000;                              % 1ST interval # included in data analysis
 %finish=250000;                            % LAST interval # included in data analysis 
-dump_int = 5000;                         % Interval between successive data dumps for ANALYSIS
+dump_int = 10000;                         % Interval between successive data dumps for ANALYSIS
 dump_Times = (start:dump_int:finish)*dt; % Time vector when data was printed for ANALYSIS analysis
 
 
 % ANALYZE THE IBAMR DATA AND CONVERT TO .VTK
 
-folder1 = ['hier_data_IB2d',num2str(run)];
-path_name = ['/Volumes/HelmsDeep/IBAMR/peri-gPC/peri-pinch/hier_data/',folder1,'/']; % Path to IBAMR Data
-folder_Name = 'forces_VTK_HELL_YEAH';                         % Name of folder to save .vtk data!
-print_IBAMR_hier_data_to_VTK(path_name,start,dump_int,finish,dt,folder_Name);
+folder1 = strcat('hier_data_IB2d', num2str(run));
+paths.hier_folder = strcat(paths.ibamr, folder1,'/'); % Path to IBAMR Data
+paths.folder_Name = 'forces_VTK_HELL_YEAH';                         % Name of folder to save .vtk data!
+print_IBAMR_hier_data_to_VTK(paths, start, dump_int, finish, dt);
 
 
 % SET PATH TO NEW VTK FORCE DATA!
-pathForce= ['/Volumes/HelmsDeep/IBAMR/peri-gPC/peri-pinch/hier_data/',folder1,'/',folder_Name,'/'];
+paths.pathForce= strcat(paths.hier_folder, paths.folder_Name, '/');
 
 
 % Initialize storage for force data 
@@ -95,8 +95,9 @@ for i=(start+dump_int):dump_int:finish
         end
         
         % Imports immersed boundary positions %
-        [xLag,yLag] = give_Lag_Positions(pathForce,numSim);
-        [xLag_Prev,yLag_Prev] = give_Lag_Positions(pathForce,numSim_Prev);
+        paths.pathForce
+        [xLag,yLag] = give_Lag_Positions(paths.pathForce, numSim);
+        [xLag_Prev,yLag_Prev] = give_Lag_Positions(paths.pathForce, numSim_Prev);
 
         % Computes spatial distance between current and previous Lag. Pts.
         dist_Vec = ( (xLag - xLag_Prev ).^2 + ( yLag - yLag_Prev ).^2 ).^(1/2);
@@ -114,7 +115,7 @@ for i=(start+dump_int):dump_int:finish
         %   fLagNorm: magnitude of NORMAL force at boundary
         %   fLagTan: magnitude of TANGENT force at boundary
         %
-        [fLagMag,fLagNorm,fLagTan] = import_Lagrangian_Force_Data(pathForce,numSim);
+        [fLagMag,fLagNorm,fLagTan] = import_Lagrangian_Force_Data(paths.pathForce, numSim);
         
         % Compute Cost of Transport at Particular Time-Step ( COT_i = |V_i||F_i| / L )
         COT_Vec(ct) = sqrt( speed_Vec'*speed_Vec )*sqrt( fLagMag'*fLagMag ) / L; 
@@ -182,7 +183,7 @@ end
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function print_IBAMR_hier_data_to_VTK(path_name,starting_time,time_step,final_time,timestep,folder_Name)
+function print_IBAMR_hier_data_to_VTK(paths,starting_time,time_step,final_time,timestep)
 
 
 % FOR THIS CODE YOU MUST TELL IT:
@@ -212,7 +213,7 @@ velocity=0.0075; % characteristic velocity (m/s^2)
 length=  208e-6; % characteristic length (m)
 
 % Change to Folder To Store .vtk Files
-mkdir([path_name,folder_Name]);
+mkdir(strcat(paths.hier_folder,paths.folder_Name));
 
 % Print program information to screen
 fprintf('\n\n              <--*** PRINTS hier_IB2d_data to VTK format ***--> \n\n');
@@ -224,11 +225,11 @@ for k=starting_time:time_step:final_time
     
     % Points to FileID for Specific Timestep
     if k < 10000
-        fileID = fopen([path_name 'F.0' num2str(k)])  %This line opens the file of interest and gives it an FileID #
-        fileID2 = fopen([path_name 'X.0' num2str(k)])
+    fileID =  fopen(strcat(paths.hier_folder, 'F.0', num2str(k)));  %This line opens the file of interest and gives it an FileID #
+        fileID2 = fopen(strcat(paths.hier_folder, 'X.0', num2str(k)));
     else
-        fileID = fopen([path_name 'F.' num2str(k)]);  %This line opens the file of interest and gives it an FileID #
-        fileID2 = fopen([path_name 'X.' num2str(k)]);
+        fileID =  fopen(strcat(paths.hier_folder, 'F.', num2str(k)));  %This line opens the file of interest and gives it an FileID #
+        fileID2 = fopen(strcat(paths.hier_folder, 'X.', num2str(k)));
     end
     
     % Read in Force Data
@@ -256,13 +257,13 @@ for k=starting_time:time_step:final_time
     [F_Tan_Mag,F_Normal_Mag] = give_Force_Magnitude_Scalings(Npts,F_Tan,F_Normal,cutoff_Yes);
     
     % Print Force Data to VTK Format
-    print_Forces_to_VTK([path_name,folder_Name],num2str(k),lagPts,F_Lag,F_Tan_Mag,F_Normal_Mag)
+    print_Forces_to_VTK(paths, num2str(k), lagPts, F_Lag, F_Tan_Mag, F_Normal_Mag)
     
     % Save (x,y) Positions to VTK Format
-    print_XY_Positions_to_VTK([path_name,folder_Name],num2str(k),lagPts);
+    print_XY_Positions_to_VTK(paths, num2str(k), lagPts);
     
     % Plots stuff in MATLAB (previously used for testing only)
-    print_Lagrangian_Mesh_and_Forces(lagPts,F_Tan_Mag,F_Normal_Mag);
+    print_Lagrangian_Mesh_and_Forces(lagPts, F_Tan_Mag, F_Normal_Mag);
 
 end
 
@@ -322,17 +323,17 @@ Npts = length(lagPtsNew(:,1));
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function print_XY_Positions_to_VTK(folder_name,strNUM,lagPts)
+function print_XY_Positions_to_VTK(paths, strNUM, lagPts)
 
-cd(folder_name); %change directory to force_VTK_Files folder
+%cd(folder_name); %change directory to force_VTK_Files folder
 
 % Define name for 'filename'.vtk 
-filename = ['lagsPts.' strNUM '.vtk'];
+filename = strcat(paths.hier_folder, paths.folder_Name, '/', 'lagsPts.', strNUM, '.vtk');
 
 % Save (x,y) pts to .vtk format
 savevtk_points( lagPts, filename, 'lagPts')
-
-cd .. % Get out of force_VTK_Files
+%
+%cd .. % Get out of force_VTK_Files
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -382,10 +383,9 @@ fclose(file);
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function print_Forces_to_VTK(folder_Name,strNUM,lagPts,F_Lag,F_Tan_Mag,F_Normal_Mag)
+function print_Forces_to_VTK(paths, strNUM, lagPts, F_Lag, F_Tan_Mag, F_Normal_Mag)
 
-
-cd(folder_Name); %change directory to force_VTK_Files folder
+%cd(folder_Name); %change directory to force_VTK_Files folder
 
     fMagName = ['fMag.' strNUM '.vtk'];
     fNormalName = ['fNorm.' strNUM '.vtk'];
@@ -393,11 +393,11 @@ cd(folder_Name); %change directory to force_VTK_Files folder
 
     fLagMag = sqrt( F_Lag(:,1).^2 + F_Lag(:,2).^2 ); % Compute magnitude of forces on boundary
 
-    savevtk_points_with_scalar_data( lagPts, fLagMag, fMagName, 'fMag');
-    savevtk_points_with_scalar_data( lagPts, F_Normal_Mag, fNormalName, 'fNorm');
-    savevtk_points_with_scalar_data( lagPts, F_Tan_Mag, fTangentName, 'fTan');
+    savevtk_points_with_scalar_data(paths, lagPts, fLagMag, fMagName, 'fMag');
+    savevtk_points_with_scalar_data(paths, lagPts, F_Normal_Mag, fNormalName, 'fNorm');
+    savevtk_points_with_scalar_data(paths, lagPts, F_Tan_Mag, fTangentName, 'fTan');
 
-cd .. % Get out of force_VTK_Files
+%cd .. % Get out of force_VTK_Files
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -406,7 +406,7 @@ cd .. % Get out of force_VTK_Files
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function savevtk_points_with_scalar_data( X, scalarArray, filename, vectorName)
+function savevtk_points_with_scalar_data(paths, X, scalarArray, filename, vectorName)
 
 %X is matrix of size Nx3
 
@@ -414,7 +414,7 @@ N = length( X(:,1) );
 
 
 %TRY PRINTING THEM AS UNSTRUCTURED_GRID
-file = fopen (filename, 'w');
+file = fopen (strcat(paths.hier_folder,paths.folder_Name,'/', filename), 'w');
 fprintf(file, '# vtk DataFile Version 2.0\n');
 fprintf(file, [vectorName '\n']);
 fprintf(file, 'ASCII\n');
@@ -635,7 +635,7 @@ analysis_path = pwd;
 
 [xLag,yLag] = read_Lagrangian_Data_From_vtk(path,numSim);
 
-cd(analysis_path);
+%cd(analysis_path);
 
 clear analysis_path;
 
@@ -681,9 +681,9 @@ clear strChoice first;
 
 function Fdata = read_Force_Scalar_Data_From_vtk(path,simNums,strChoice)
 
-cd(path);
+%cd(path);
 
-filename = [strChoice '.' num2str(simNums) '.vtk'];  % desired lagPts.xxxx.vtk file
+filename = strcat(path, strChoice, '.', num2str(simNums), '.vtk');  % desired lagPts.xxxx.vtk file
 
 fileID = fopen(filename);
 if ( fileID== -1 )
@@ -691,7 +691,7 @@ if ( fileID== -1 )
 end
 
 str = fgets(fileID); %-1 if eof
-if ~strcmp( str(3:5),'vtk');
+if ~strcmp( str(3:5),'vtk')
     error('\nNot in proper VTK format');
 end
 
@@ -722,7 +722,7 @@ fclose(fileID);               % Closes the data file.
 
 Fdata = forces(:,1);         % magnitude of the force
 
-cd ..;                        % Change directory back to ../hier_IB2d_data/ directory
+%cd ..;                        % Change directory back to ../hier_IB2d_data/ directory
 
 clear mat str filename fileID count;
 
@@ -795,12 +795,12 @@ fclose(fid);
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function [xLag,yLag] = read_Lagrangian_Data_From_vtk(path,simNums)
+function [xLag,yLag] = read_Lagrangian_Data_From_vtk(path, simNums)
 
 
-cd(path);
+%cd(path);
 
-filename = ['lagsPts.' num2str(simNums) '.vtk'];  % desired lagPts.xxxx.vtk file
+filename = strcat(path, 'lagsPts.', num2str(simNums), '.vtk');  % desired lagPts.xxxx.vtk file
 
 fileID = fopen(filename);
 if ( fileID== -1 )
@@ -808,7 +808,7 @@ if ( fileID== -1 )
 end
 
 str = fgets(fileID); %-1 if eof
-if ~strcmp( str(3:5),'vtk');
+if ~strcmp( str(3:5),'vtk')
     error('\nNot in proper VTK format');
 end
 
@@ -836,7 +836,7 @@ fclose(fileID);               % Closes the data file.
 xLag = vertices(:,1);         % x-Lagrangian Pts.
 yLag = vertices(:,2);         % y-Lagrangian Pts.
 
-cd ..;                        % Change directory back to ../viz_IB2d/ directory
+%cd ..;                        % Change directory back to ../viz_IB2d/ directory
 
 clear mat str filename fileID count;
 

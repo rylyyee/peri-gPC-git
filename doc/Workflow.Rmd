@@ -35,7 +35,8 @@ The pipeline has the following components:
  4. The execution of IBAMR simulations for the gPC simulation set. 
  5. The execution of VisIt data analysis to extract fluid speed information from each IBAMR simulation. 
  6. The execution of R scripts for calculation of final values. 
- 7. The generation of figures for publication from analyzed data. 
+ 7. The execution of MATLAB script for calculating cost of transport and work.
+ 8. The generation of figures for publication from analyzed data. 
 
 ## 1. The cloning of the projection from Github
 
@@ -129,6 +130,16 @@ For the velocity profile file, enter next:
 
 This will produce a folder with time series data for each simulation and some combined results of Q and other measures of fluid flow in the circulatory system. 
 
+## 7. Execute MATLAB script to calculate cost of transport and work
 
+The final script to execute is the matlab script that calculates cost of transport and work performed by the heart tube on the fluid. This script works on the `hier_data_IB2d` data produced through IBAMR. These folders should be located in the same directory as the `viz_IB2d` folders also produced. 
+
+To run the script on Bridges, run the following script located in `src/bridges`: 
+
+`$ sbatch runcost.job`
+
+Before running the script, be sure to change the simulation set number on line 12, the track name in line 15, and the appropriate top working directory in line 18. 
+
+This will produce a csv file located in `results/matlab-csv-files/{track}_results/` with two columns: cost of transport and work. 
 
 

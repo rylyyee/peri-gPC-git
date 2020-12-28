@@ -6,7 +6,7 @@
 #################################################################################################################
 
 #### Parameter definitions ####
-track <- "branch"         # Options: "racetrack", "branch", "obstacles", "branchandobstacles"
+track <- "obstacles"         # Options: "racetrack", "branch", "obstacles", "branchandobstacles"
 n <- 165
 
 # Parameters that should not change
@@ -27,7 +27,7 @@ allofit[, 4] <- parameters$V3
 parameter_names<-c("Wo", "CR", "Freq")
 
 # Checks for and makes new directory for time series data
-dir.create(file.path(paste("./results/r-csv-files/", track, "_results", sep = ""),
+dir.create(file.path(paste("./results/r-csv-files/", track, "_results/", sep = ""),
                      "time-series/"), showWarnings = FALSE)
 
 #### Function definitions ####
